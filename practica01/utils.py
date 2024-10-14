@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def histogram(inImage, nBins=256):
     """
@@ -32,3 +33,37 @@ def centerMatrix(matrix):
     rows, columns = matrix.shape
     
     return np.floor(rows / 2).astype(int) + 1, np.floor(columns / 2).astype(int) + 1
+
+def show_imgs_and_histogram(img01, img02, nbins=256):
+    # Crear una figura con 2x2 subplots: dos para las imágenes y dos para los histogramas
+    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+
+    # Mostrar la primera imagen
+    axs[0, 0].imshow(img01, cmap='gray')
+    axs[0, 0].set_title('Imagen 1')
+    axs[0, 0].axis('off')  # Ocultar ejes
+
+    # Mostrar la segunda imagen
+    axs[0, 1].imshow(img02, cmap='gray')
+    axs[0, 1].set_title('Imagen 2')
+    axs[0, 1].axis('off')  # Ocultar ejes
+
+    # Calcular el histograma de la primera imagen
+    histograma1 = histogram(img01, nbins)[0]
+
+    # Graficar el histograma de la primera imagen
+    axs[1, 0].plot(histograma1, color='black')
+    axs[1, 0].set_title('Histograma de Imagen 1')
+    axs[1, 0].set_xlim([0, nbins])  # Limitar el rango del eje x (niveles de gris)
+
+    # Calcular el histograma de la segunda imagen
+    histograma2 = histogram(img02, nbins)[0]
+
+    # Graficar el histograma de la segunda imagen
+    axs[1, 1].plot(histograma2, color='black')
+    axs[1, 1].set_title('Histograma de Imagen 2')
+    axs[1, 1].set_xlim([0, nbins])  # Limitar el rango del eje x (niveles de gris)
+
+    # Ajustar los márgenes y mostrar las gráficas
+    plt.tight_layout()
+    plt.show()

@@ -66,7 +66,14 @@ def filterImage(inImage, kernel):
     imagePadded = np.pad(outImage, 1, mode='constant')
     
     rows, columns = outImage.shape
-    rowsKernel, columnsKernel = kernel.shape
+    
+    rowsKernel = kernel.shape
+    
+    if len(rowsKernel) == 1:
+        rowsKernel = rowsKernel[0]
+        columnsKernel = 1
+    else:
+        rowsKernel, columnsKernel = rowsKernel
 
     
     for i in range(rows):
@@ -98,3 +105,17 @@ def gaussKernel1D(sigma):
     kernel /= np.sum(kernel)
     
     return kernel
+
+def gaussianFilter(inImage, sigma):
+    """
+    Nota. Como el filtro Gaussiano es lineal y separable podemos implementar este suavi-
+    zado simplemente convolucionando la imagen, primero, con un kernel Gaussiano unidi-
+    mensional 1 x N y, luego, convolucionando el resultado con el kernel transpuesto N x 1.
+    """
+    
+    kernel = gaussKernel1D(sigma)
+    
+    outImage = filterImage(inImage, kernel)
+    outImage = filterImage(outImage, kernel.T)
+    
+    return outImage

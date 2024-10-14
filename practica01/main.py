@@ -2,6 +2,7 @@ import functions as f
 import cv2
 import skimage as ski
 import numpy as np
+import utils
 
 def main():
     
@@ -15,17 +16,16 @@ def main():
                         [-1,  8, -1], 
                         [-1, -1, -1]])
     
-    img = cv2.imread('imagenesPrueba/eq0.png', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('imagenesPrueba/grid0.png', cv2.IMREAD_GRAYSCALE)
     img = ski.util.img_as_float(img)
-
-    #imgOut = f.adjustIntensity(img, [0.5, 0.51], [0., 1.])
-    imgOut = f.equalizeIntensity(img, 256)
-    #imgOut = f.filterImage(img, kernel02)
+    nbins = 256
+    #imgOut = f.adjustIntensity(img, [0.4, 0.60], [0., 1.])
+    #imgOut = f.equalizeIntensity(img, nbins)
+    imgOut = f.gaussianFilter(img, 1)
     
-    print(f.gaussKernel1D(1))
+    print(f.gaussKernel1D(1.3))
 
-    cv2.imshow("image", imgOut)
-    #cv2.waitKey()
+    utils.show_imgs_and_histogram(img, imgOut, nbins)
 
 
 if __name__ == "__main__":
