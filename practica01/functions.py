@@ -48,6 +48,8 @@ def equalizeIntensity(inImage, nBins=256):
     
     outImage = image_equalized.reshape(inImage.shape)
     
+    outImage = np.clip(outImage, 0., 1.)
+    
     return outImage
 
 def filterImage(inImage, kernel):
@@ -59,18 +61,40 @@ def filterImage(inImage, kernel):
         Con los píxeles que quedan fuera de la imagen se asumen como 0.
     """
     
-    # Hacer una copia de la imagen para no modificar la original
-    imageOut = np.copy(inImage)
+    outImage = np.copy(inImage)
     
-    imagePadded = np.pad(imageOut, 1, mode='constant')
+    imagePadded = np.pad(outImage, 1, mode='constant')
     
-    rows, columns = imageOut.shape
+    rows, columns = outImage.shape
     rowsKernel, columnsKernel = kernel.shape
+
     
     for i in range(rows):
         for j in range(columns):
-            imageOut[i, j] = np.sum(imagePadded[i:i + rowsKernel, j:j + columnsKernel] * kernel)
+            outImage[i, j] = np.sum(imagePadded[i:i + rowsKernel, j:j + columnsKernel] * kernel)
     
+    outImage = np.clip(outImage, 0., 1.)
     
-    return imageOut
+    return outImage
+
+
+def gaussKernel1D(sigma):
+    """    
+    Parámetros
+    ----------
     
+    - sigma: Desviación estándar de la distribución normal.
+    
+    Return
+    ----------
+    - kernel: Vector 1xN con el kernel de la distribución normal, teniendo en cuenta que:
+        - El centro x = 0 de la Gaussiana está en la posición ⌊N/2⌋ + 1.
+        - N se calcula a partir de σ como N = 2⌈3σ⌉ + 1
+    """
+
+    N = 2 * np.ceil(3 * sigma) + 1
+    x = np.arange(-N // 2, N // 2 + 1)
+    kernel = np.exp(-x**2 / (2 * sigma**2))
+    kernel /= np.sum(kernel)
+    
+    return kernel
