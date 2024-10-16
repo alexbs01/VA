@@ -22,7 +22,8 @@ def main():
     #imgOut = f.adjustIntensity(img, [0.4, 0.60], [0., 1.])
     #imgOut = f.equalizeIntensity(img, nbins)
     #imgOut = f.filterImage(img, kernel02)
-    imgOut = f.gaussianFilter(img, 1)
+    #imgOut = f.gaussianFilter(img, 1)
+    imgOut = f.medianFilter(img, 3)
 
     print(f.gaussKernel1D(1))
     utils.show_imgs_and_histogram(img, imgOut, nbins)

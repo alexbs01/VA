@@ -102,3 +102,25 @@ def gaussianFilter(inImage, sigma):
     outImage = filterImage(outImage, np.transpose(kernel))
     
     return outImage
+
+def medianFilter(inImage, filterSize):
+    """
+    Parámetros
+    -----
+    
+    - filterSize: Valor entero N indicando que el tamaño de ventana es de NxN. La posición
+    central de la ventana es (⌊N/2⌋ + 1, ⌊N/2⌋ + 1).
+    """
+    
+    rows, columns = inImage.shape
+    
+    image_padded = np.pad(inImage, ((filterSize // 2, filterSize // 2), (filterSize // 2, filterSize // 2)), mode='constant')
+    
+    result = np.zeros((rows, columns))
+    
+    for i in range(rows):
+        for j in range(columns):
+            region = image_padded[i:i + filterSize, j:j + filterSize]
+            result[i, j] = np.mean(region)
+    
+    return result
