@@ -22,6 +22,40 @@ def histogram(inImage, nBins=256):
     
     return hist, intervals
 
+def convalution2D(image, kernel):
+    rows, columns = image.shape
+    
+    if len(kernel.shape) == 2:
+        rows_kernel, columns_kernel = kernel.shape
+    else:
+        rows_kernel, columns_kernel = 1, kernel.shape[0]
+    
+    image_padded = np.pad(image, 1, mode='constant')
+    
+    result = np.zeros((rows, columns))
+    
+    for i in range(rows):
+        for j in range(columns):
+            result[i, j] = np.sum(image_padded[i:i + rows_kernel, j:j + columns_kernel] * kernel)
+    
+    return result
+
+def convalution2D(image, kernel):
+    rows, columns = image.shape
+    
+    rows_kernel, columns_kernel = kernel.shape
+    
+    image_padded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode='constant')
+    
+    result = np.zeros((rows, columns))
+    
+    for i in range(rows):
+        for j in range(columns):
+            region = image_padded[i:i + rows_kernel, j:j + columns_kernel]
+            result[i, j] = np.sum(region * kernel)
+    
+    return result
+
 
 def centerMatrix(matrix):
     """
@@ -40,12 +74,12 @@ def show_imgs_and_histogram(img01, img02, nbins=256):
 
     # Mostrar la primera imagen
     axs[0, 0].imshow(img01, cmap='gray')
-    axs[0, 0].set_title('Imagen 1')
+    axs[0, 0].set_title('Imagen original')
     axs[0, 0].axis('off')  # Ocultar ejes
 
     # Mostrar la segunda imagen
     axs[0, 1].imshow(img02, cmap='gray')
-    axs[0, 1].set_title('Imagen 2')
+    axs[0, 1].set_title('Imagen procesada')
     axs[0, 1].axis('off')  # Ocultar ejes
 
     # Calcular el histograma de la primera imagen
@@ -53,7 +87,7 @@ def show_imgs_and_histogram(img01, img02, nbins=256):
 
     # Graficar el histograma de la primera imagen
     axs[1, 0].plot(histograma1, color='black')
-    axs[1, 0].set_title('Histograma de Imagen 1')
+    axs[1, 0].set_title('Histograma de imagen original')
     axs[1, 0].set_xlim([0, nbins])  # Limitar el rango del eje x (niveles de gris)
 
     # Calcular el histograma de la segunda imagen
@@ -61,7 +95,7 @@ def show_imgs_and_histogram(img01, img02, nbins=256):
 
     # Graficar el histograma de la segunda imagen
     axs[1, 1].plot(histograma2, color='black')
-    axs[1, 1].set_title('Histograma de Imagen 2')
+    axs[1, 1].set_title('Histograma de imagen procesada')
     axs[1, 1].set_xlim([0, nbins])  # Limitar el rango del eje x (niveles de gris)
 
     # Ajustar los márgenes y mostrar las gráficas

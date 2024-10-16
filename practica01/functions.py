@@ -60,25 +60,7 @@ def filterImage(inImage, kernel):
         Con numpy se puede hacer una convolución de una matriz con otra matriz.
         Con los píxeles que quedan fuera de la imagen se asumen como 0.
     """
-    
-    outImage = np.copy(inImage)
-    
-    imagePadded = np.pad(outImage, 1, mode='constant')
-    
-    rows, columns = outImage.shape
-    
-    rowsKernel = kernel.shape
-    
-    if len(rowsKernel) == 1:
-        rowsKernel = rowsKernel[0]
-        columnsKernel = 1
-    else:
-        rowsKernel, columnsKernel = rowsKernel
-
-    
-    for i in range(rows):
-        for j in range(columns):
-            outImage[i, j] = np.sum(imagePadded[i:i + rowsKernel, j:j + columnsKernel] * kernel)
+    outImage = utils.convalution2D(inImage, kernel)
     
     outImage = np.clip(outImage, 0., 1.)
     
@@ -114,8 +96,9 @@ def gaussianFilter(inImage, sigma):
     """
     
     kernel = gaussKernel1D(sigma)
+    kernel = kernel.reshape(1, -1)
     
     outImage = filterImage(inImage, kernel)
-    outImage = filterImage(outImage, kernel.T)
+    outImage = filterImage(outImage, np.transpose(kernel))
     
     return outImage
