@@ -60,9 +60,16 @@ def filterImage(inImage, kernel):
         Con numpy se puede hacer una convolución de una matriz con otra matriz.
         Con los píxeles que quedan fuera de la imagen se asumen como 0.
     """
-    outImage = utils.convalution2D(inImage, kernel)
+    rows, columns = inImage.shape
     
-    outImage = np.clip(outImage, 0., 1.)
+    result = np.zeros((rows, columns))
+    
+    for i in range(rows):
+        for j in range(columns):
+            region = utils.getRegion(inImage, kernel, i, j)
+            result[i, j] = np.sum(region * kernel)
+    
+    outImage = np.clip(result, 0., 1.)
     
     return outImage
 
@@ -120,7 +127,8 @@ def medianFilter(inImage, filterSize):
     
     for i in range(rows):
         for j in range(columns):
-            region = image_padded[i:i + filterSize, j:j + filterSize]
-            result[i, j] = np.mean(region)
+            #region = image_padded[i:i + filterSize, j:j + filterSize]
+            region = utils.getRegion(inImage, np.ones((filterSize, filterSize)), i, j)
+            result[i, j] = np.median(region)
     
     return result

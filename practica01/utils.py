@@ -43,18 +43,21 @@ def convalution2D(image, kernel):
 def convalution2D(image, kernel):
     rows, columns = image.shape
     
-    rows_kernel, columns_kernel = kernel.shape
-    
-    image_padded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode='constant')
-    
     result = np.zeros((rows, columns))
     
     for i in range(rows):
         for j in range(columns):
-            region = image_padded[i:i + rows_kernel, j:j + columns_kernel]
+            region = getRegion(image, kernel, i, j)
             result[i, j] = np.sum(region * kernel)
     
     return result
+
+def getRegion(image, kernel, i, j):
+    rows_kernel, columns_kernel = kernel.shape
+    
+    image_padded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode='constant')
+    
+    return image_padded[i:i + rows_kernel, j:j + columns_kernel]
 
 
 def centerMatrix(matrix):
