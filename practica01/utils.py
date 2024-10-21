@@ -25,7 +25,9 @@ def histogram(inImage, nBins=256):
 def getRegion(image, kernel, i, j):
     rows_kernel, columns_kernel = kernel.shape
     
-    return image[i:i + rows_kernel, j:j + columns_kernel]
+    imagePadded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode='constant')
+    
+    return imagePadded[i:i + rows_kernel, j:j + columns_kernel]
 
 def compareWithSE(region, SE):    
     rows, columns = SE.shape

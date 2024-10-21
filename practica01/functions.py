@@ -67,6 +67,8 @@ def filterImage(inImage, kernel):
     for i in range(rows):
         for j in range(columns):
             region = utils.getRegion(inImage, kernel, i, j)
+            print(region.shape)
+            print(kernel.shape)
             result[i, j] = np.sum(region * kernel)
     
     outImage = np.clip(result, 0., 1.)
@@ -151,7 +153,7 @@ def erode(inImage, SE, center=[]):
             region = np.round(region)
             
             if utils.compareWithSE(region, SE):
-                outImage[i + center[0], j + center[1]] = 1
+                outImage[i, j] = 1
     
     return outImage
 
