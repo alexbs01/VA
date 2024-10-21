@@ -121,14 +121,63 @@ def medianFilter(inImage, filterSize):
     
     rows, columns = inImage.shape
     
-    image_padded = np.pad(inImage, ((filterSize // 2, filterSize // 2), (filterSize // 2, filterSize // 2)), mode='constant')
-    
     result = np.zeros((rows, columns))
     
     for i in range(rows):
         for j in range(columns):
-            #region = image_padded[i:i + filterSize, j:j + filterSize]
             region = utils.getRegion(inImage, np.ones((filterSize, filterSize)), i, j)
             result[i, j] = np.median(region)
     
     return result
+
+def erode(inImage, SE, center=[]):
+    """
+    - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
+    - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
+    la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
+    se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
+    """
+    if center == []:
+        center = utils.centerMatrix(SE)
+    
+    outImage = np.zeros(inImage.shape)
+    
+    rows, columns = inImage.shape
+    rowsSE, columnsSE = SE.shape
+    
+    for i in range(center[0], rows - rowsSE + 1):
+        for j in range(center[1], columns - columnsSE + 1):
+            region = utils.getRegion(inImage, SE, i, j)
+            region = np.round(region)
+            
+            if utils.compareWithSE(region, SE):
+                outImage[i + center[0], j + center[1]] = 1
+    
+    return outImage
+
+def dilate(inImage, SE, center=[]):
+    """
+    - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
+    - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
+    la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
+    se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
+    """
+    pass
+
+def opening(inImage, SE, center=[]):
+    """
+    - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
+    - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
+    la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
+    se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
+    """
+    pass
+
+def closing(inImage, SE, center=[]):
+    """
+    - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
+    - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
+    la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
+    se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
+    """
+    pass

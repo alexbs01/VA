@@ -22,43 +22,26 @@ def histogram(inImage, nBins=256):
     
     return hist, intervals
 
-def convalution2D(image, kernel):
-    rows, columns = image.shape
-    
-    if len(kernel.shape) == 2:
-        rows_kernel, columns_kernel = kernel.shape
-    else:
-        rows_kernel, columns_kernel = 1, kernel.shape[0]
-    
-    image_padded = np.pad(image, 1, mode='constant')
-    
-    result = np.zeros((rows, columns))
-    
-    for i in range(rows):
-        for j in range(columns):
-            result[i, j] = np.sum(image_padded[i:i + rows_kernel, j:j + columns_kernel] * kernel)
-    
-    return result
-
-def convalution2D(image, kernel):
-    rows, columns = image.shape
-    
-    result = np.zeros((rows, columns))
-    
-    for i in range(rows):
-        for j in range(columns):
-            region = getRegion(image, kernel, i, j)
-            result[i, j] = np.sum(region * kernel)
-    
-    return result
-
 def getRegion(image, kernel, i, j):
     rows_kernel, columns_kernel = kernel.shape
     
-    image_padded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode='constant')
-    
-    return image_padded[i:i + rows_kernel, j:j + columns_kernel]
+    return image[i:i + rows_kernel, j:j + columns_kernel]
 
+def compareWithSE(region, SE):    
+    rows, columns = SE.shape
+    
+    for i in range(rows):
+        for j in range(columns):
+            print(region)
+            print(SE)
+            if SE[i, j] == 1 and region[i, j] == 0:
+                return False
+                
+    print(region)
+    print(SE)
+    print()
+    
+    return True
 
 def centerMatrix(matrix):
     """
@@ -69,7 +52,7 @@ def centerMatrix(matrix):
     
     rows, columns = matrix.shape
     
-    return np.floor(rows / 2).astype(int) + 1, np.floor(columns / 2).astype(int) + 1
+    return [np.floor(rows // 2).astype(int), np.floor(columns // 2).astype(int)]
 
 def show_imgs_and_histogram(img01, img02, nbins=256):
     # Crear una figura con 2x2 subplots: dos para las imágenes y dos para los histogramas
