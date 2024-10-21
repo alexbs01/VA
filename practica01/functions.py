@@ -164,7 +164,23 @@ def dilate(inImage, SE, center=[]):
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
     se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
     """
-    pass
+    if center == []:
+        center = utils.centerMatrix(SE)
+    
+    outImage = np.zeros(inImage.shape)
+    
+    rows, columns = inImage.shape
+    rowsSE, columnsSE = SE.shape
+    
+    for i in range(center[0], rows - rowsSE + 1):
+        for j in range(center[1], columns - columnsSE + 1):
+            region = utils.getRegion(inImage, SE, i, j)
+            region = np.round(region)
+            
+            if np.equal(region, SE).max():
+                outImage[i, j] = 1
+    
+    return outImage
 
 def opening(inImage, SE, center=[]):
     """

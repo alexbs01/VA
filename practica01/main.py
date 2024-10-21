@@ -28,7 +28,7 @@ def main():
     se04 = np.array([[1, 1]])
     
     
-    img = cv2.imread('imagenesPrueba/grid.png', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('imagenesPrueba/morph.png', cv2.IMREAD_GRAYSCALE)
     img = ski.util.img_as_float(img)
     nbins = 256
     
@@ -36,8 +36,9 @@ def main():
     #imgOut = f.equalizeIntensity(img, nbins)
     #imgOut = f.filterImage(img, kernel02)
     #imgOut = f.gaussianFilter(img, 1)
-    imgOut = f.medianFilter(img, 3)
+    #imgOut = f.medianFilter(img, 3)
     #imgOut = f.erode(img, se02)
+    imgOut = f.dilate(img, se04)
     utils.show_imgs_and_histogram(img, imgOut, nbins)
 
 

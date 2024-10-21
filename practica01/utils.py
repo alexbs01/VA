@@ -34,14 +34,8 @@ def compareWithSE(region, SE):
     
     for i in range(rows):
         for j in range(columns):
-            print(region)
-            print(SE)
             if SE[i, j] == 1 and region[i, j] == 0:
                 return False
-                
-    print(region)
-    print(SE)
-    print()
     
     return True
 
