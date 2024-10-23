@@ -255,7 +255,7 @@ def fill(inImage, seeds, SE=[], center=[]):
     outImage = np.copy(inImage)
     
     for seed in seeds:
-        rowSeed, columnSeed = seed.shape
+        rowSeed, columnSeed = seed
         if inImage[rowSeed, columnSeed] == 0:
             outImage[rowSeed, columnSeed] = 1
         
