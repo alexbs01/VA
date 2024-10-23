@@ -29,7 +29,7 @@ def getRegion(image, kernel, i, j):
     
     return imagePadded[i:i + rows_kernel, j:j + columns_kernel]
 
-def compareWithSE(region, SE):    
+def compareForErode(region, SE):    
     rows, columns = SE.shape
     
     for i in range(rows):
@@ -39,7 +39,7 @@ def compareWithSE(region, SE):
     
     return True
 
-def compareForDilation(region, SE):
+def compareForDilate(region, SE):
     rows, columns = SE.shape
     
     for i in range(rows):

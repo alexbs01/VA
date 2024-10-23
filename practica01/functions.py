@@ -1,11 +1,13 @@
 import numpy as np
 import utils
 
+####################################
+# HISTOGRAMAS: MEJORA DE CONTRASTE #
+####################################
+
 def adjustIntensity(inImage, inRange=[], outRange=[0., 1.]):
     """
-    adjustIntensity
-
-    Descripción: Ajusta la intensidad de una imagen. De entrada recibe un intervalo, todo lo que esté por arriba o abajo saturará a los valores de los extremos.
+    Ajusta la intensidad de una imagen. De entrada recibe un intervalo, todo lo que esté por arriba o abajo saturará a los valores de los extremos.
         y = mx + b
         m: (Mo - mo) / (Mi - mi)
         b: Mo - m * Mi
@@ -26,14 +28,12 @@ def adjustIntensity(inImage, inRange=[], outRange=[0., 1.]):
     outImage = np.clip(outImage, outMin, outMax)
 
     return outImage
-    
-
 
 def equalizeIntensity(inImage, nBins=256):
     """
-    equalizeIntensity
+    Expande donde hay mucha información y comprime donde hay poca.
     
-    Descripción: Expande donde hay mucha información y comprime donde hay poca.
+    nBins: Número de intervalos en los que se divide el histograma.
     """
     
     # Hacer una copia de la imagen para no modificar la original
@@ -52,11 +52,14 @@ def equalizeIntensity(inImage, nBins=256):
     
     return outImage
 
+
+################################
+# FILTRADO ESPACIAL: SUAVIZADO #
+################################
+
 def filterImage(inImage, kernel):
     """
-    filterImage
-
-    Descripción: Filtrar una imagen con un kernel de convolución.
+    Filtrar una imagen con un kernel de convolución.
         Con numpy se puede hacer una convolución de una matriz con otra matriz.
         Con los píxeles que quedan fuera de la imagen se asumen como 0.
     """
@@ -74,7 +77,6 @@ def filterImage(inImage, kernel):
     outImage = np.clip(result, 0., 1.)
     
     return outImage
-
 
 def gaussKernel1D(sigma):
     """    
@@ -99,9 +101,9 @@ def gaussKernel1D(sigma):
 
 def gaussianFilter(inImage, sigma):
     """
-    Nota. Como el filtro Gaussiano es lineal y separable podemos implementar este suavi-
-    zado simplemente convolucionando la imagen, primero, con un kernel Gaussiano unidi-
-    mensional 1 x N y, luego, convolucionando el resultado con el kernel transpuesto N x 1.
+    Nota. Como el filtro Gaussiano es lineal y separable podemos implementar este suavizado 
+    simplemente convolucionando la imagen, primero, con un kernel Gaussiano unidimensional 1 x N 
+    y, luego, convolucionando el resultado con el kernel transpuesto N x 1.
     """
     
     kernel = gaussKernel1D(sigma)
@@ -132,8 +134,18 @@ def medianFilter(inImage, filterSize):
     
     return result
 
+###########################
+# OPERADORES MORFOLÓGICOS #
+###########################
+
 def erode(inImage, SE, center=[]):
     """
+    Se recorre la matriz de la imagen y se compara con el elemento estructurante.
+    Si todos los elementos del elemento estructurante son 1 y los elementos de la región
+    de la imagen son 1, entonces se asigna 1 a la imagen de salida.
+    
+    Buscar la región de la imagen que coincida con el elemento estructurante.
+    
     - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
     - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
@@ -152,13 +164,19 @@ def erode(inImage, SE, center=[]):
             region = utils.getRegion(inImage, SE, i, j)
             region = np.round(region)
             
-            if utils.compareWithSE(region, SE):
+            if utils.compareForErode(region, SE):
                 outImage[i, j] = 1
     
     return outImage
 
 def dilate(inImage, SE, center=[]):
     """
+    Se recorre la matriz de la imagen y se compara con el elemento estructurante.
+    Si al menos un elemento del elemento estructurante es 1 y los elementos de la región
+    de la imagen son 1, entonces se asigna 1 a la imagen de salida.
+    
+    Agrandar los objetos de la imagen.
+    
     - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
     - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
@@ -176,13 +194,18 @@ def dilate(inImage, SE, center=[]):
             region = utils.getRegion(inImage, SE, i, j)
             region = np.round(region)
             
-            if utils.compareForDilation(region, SE):
+            if utils.compareForDilate(region, SE):
                 outImage[i, j] = 1
     
     return outImage
 
 def opening(inImage, SE, center=[]):
     """
+    Erosionar y luego dilata usando el mismo elemento estructurante
+    
+    Buscar la región de la imagen que coincida con el elemento estructurante 
+    filtrando de la imagen el resto de los objetos.
+    
     - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
     - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
@@ -196,6 +219,11 @@ def opening(inImage, SE, center=[]):
 
 def closing(inImage, SE, center=[]):
     """
+    Primero dilatar y luego erosionar usando el mismo elemento estructurante
+    
+    Agrandar los objetos de la imagen y luego reducir el tamaño de los objetos
+    Suele ser útil para cerrar pequeños huecos.
+    
     - SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante.
     - center: Vector 1x2 con las coordenadas del centro de SE. Se asume que el [0 0] es
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
@@ -205,5 +233,39 @@ def closing(inImage, SE, center=[]):
     outImage = dilate(inImage, SE, center)
     
     outImage = erode(outImage, SE, center)
+    
+    return outImage
+
+def fill(inImage, seeds, SE=[], center=[]):
+    """
+    Rellenar un objeto de la imagen a partir de un conjunto de puntos semilla.
+    
+    seeds: Matriz Nx2 con N coordenadas (fila,columna) de los puntos semilla.
+    SE: Matriz PxQ de zeros y unos definiendo el elemento estructurante de conectividad.
+        Si es un vector vacío se asume conectividad 4 (cruz 3 x 3).
+    """
+    if SE == []:
+        SE = np.array([[0, 1, 0],
+                        [1, 1, 1],
+                        [0, 1, 0]])
+
+    if center == []:
+        center = utils.centerMatrix(SE)
+        
+    outImage = np.copy(inImage)
+    
+    for seed in seeds:
+        rowSeed, columnSeed = seed.shape
+        if inImage[rowSeed, columnSeed] == 0:
+            outImage[rowSeed, columnSeed] = 1
+        
+        region = utils.getRegion(outImage, SE, rowSeed, columnSeed)
+        region = np.round(region)
+        
+        for i in range(region.shape[0]):
+            for j in range(region.shape[1]):
+                if SE[i, j] == 1 and region[i, j] == 0:
+                    outImage[rowSeed + i - center[0], columnSeed + j - center[1]] = 1
+                    seeds.append([rowSeed + i - center[0], columnSeed + j - center[1]])
     
     return outImage

@@ -27,23 +27,22 @@ def main():
     
     se04 = np.array([[1, 1]])
     
-    se05 = np.array([[1, 1, 1]])
     
-    
-    img = cv2.imread('imagenesPrueba/morph.png', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('imagenesPrueba/image.png', cv2.IMREAD_GRAYSCALE)
     img = ski.util.img_as_float(img)
     nbins = 256
     
     #imgOut = f.adjustIntensity(img, [0.4, 0.60], [0., 1.])
-    #imgOut = f.equalizeIntensity(img, nbins)
+    #imgOut = f.equalizeIntensity(img, nbins)               # eq0.png
     #imgOut = f.filterImage(img, kernel02)
-    #imgOut = f.gaussianFilter(img, 1)
-    #imgOut = f.medianFilter(img, 3)
-    #imgOut = f.erode(img, se02)
-    #imgOut = f.dilate(img, se02)
-    #imgOut = f.opening(img, se02)
-    imgOut = f.closing(img, se05)
-    utils.show_imgs_and_histogram(img, imgOut, nbins)
+    #imgOut = f.gaussianFilter(img, 1)                      # grid.png
+    #imgOut = f.medianFilter(img, 3)                        # grid.png
+    #imgOut = f.erode(img, se02)                            # morph.png
+    #imgOut = f.dilate(img, se02)                           # morph.png
+    #imgOut = f.opening(img, se03)                          # morph.png
+    #imgOut = f.closing(img, se01)                          # morph.png
+    imgOut = f.fill(img, [[30, 30]])                        # image.png
+    utils.show_imgs_and_histogram(img, imgOut, nbins)       
 
 
 if __name__ == "__main__":
