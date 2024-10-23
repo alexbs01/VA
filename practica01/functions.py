@@ -170,14 +170,11 @@ def dilate(inImage, SE, center=[]):
     outImage = np.zeros(inImage.shape)
     
     rows, columns = inImage.shape
-    rowsSE, columnsSE = SE.shape
     
     for i in range(rows):
         for j in range(columns):
             region = utils.getRegion(inImage, SE, i, j)
             region = np.round(region)
-            
-            print(region)
             
             if utils.compareForDilation(region, SE):
                 outImage[i, j] = 1
@@ -193,11 +190,7 @@ def opening(inImage, SE, center=[]):
     """
     outImage = erode(inImage, SE, center)
     
-    print(outImage)
-    
     outImage = dilate(outImage, SE, center)
-    
-    print(outImage)
     
     return outImage
 

@@ -27,6 +27,8 @@ def main():
     
     se04 = np.array([[1, 1]])
     
+    se05 = np.array([[1, 1, 1]])
+    
     
     img = cv2.imread('imagenesPrueba/morph.png', cv2.IMREAD_GRAYSCALE)
     img = ski.util.img_as_float(img)
@@ -39,7 +41,8 @@ def main():
     #imgOut = f.medianFilter(img, 3)
     #imgOut = f.erode(img, se02)
     #imgOut = f.dilate(img, se02)
-    imgOut = f.opening(img, se03)
+    #imgOut = f.opening(img, se02)
+    imgOut = f.closing(img, se05)
     utils.show_imgs_and_histogram(img, imgOut, nbins)
 
 
