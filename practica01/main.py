@@ -38,7 +38,8 @@ def main():
     #imgOut = f.gaussianFilter(img, 1)
     #imgOut = f.medianFilter(img, 3)
     #imgOut = f.erode(img, se02)
-    imgOut = f.dilate(img, se04)
+    #imgOut = f.dilate(img, se02)
+    imgOut = f.opening(img, se03)
     utils.show_imgs_and_histogram(img, imgOut, nbins)
 
 

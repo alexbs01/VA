@@ -172,12 +172,14 @@ def dilate(inImage, SE, center=[]):
     rows, columns = inImage.shape
     rowsSE, columnsSE = SE.shape
     
-    for i in range(center[0], rows - rowsSE + 1):
-        for j in range(center[1], columns - columnsSE + 1):
+    for i in range(rows):
+        for j in range(columns):
             region = utils.getRegion(inImage, SE, i, j)
             region = np.round(region)
             
-            if np.equal(region, SE).max():
+            print(region)
+            
+            if utils.compareForDilation(region, SE):
                 outImage[i, j] = 1
     
     return outImage
@@ -189,7 +191,15 @@ def opening(inImage, SE, center=[]):
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
     se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
     """
-    pass
+    outImage = erode(inImage, SE, center)
+    
+    print(outImage)
+    
+    outImage = dilate(outImage, SE, center)
+    
+    print(outImage)
+    
+    return outImage
 
 def closing(inImage, SE, center=[]):
     """
@@ -198,4 +208,9 @@ def closing(inImage, SE, center=[]):
     la esquina superior izquierda. Si es un vector vacío (valor por defecto), el centro
     se calcula como (⌊P/2⌋ + 1, ⌊Q/2⌋ + 1).
     """
-    pass
+    
+    outImage = dilate(inImage, SE, center)
+    
+    outImage = erode(outImage, SE, center)
+    
+    return outImage

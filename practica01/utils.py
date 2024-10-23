@@ -25,7 +25,7 @@ def histogram(inImage, nBins=256):
 def getRegion(image, kernel, i, j):
     rows_kernel, columns_kernel = kernel.shape
     
-    imagePadded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode='constant')
+    imagePadded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), constant_values=0, mode='constant')
     
     return imagePadded[i:i + rows_kernel, j:j + columns_kernel]
 
@@ -38,6 +38,16 @@ def compareWithSE(region, SE):
                 return False
     
     return True
+
+def compareForDilation(region, SE):
+    rows, columns = SE.shape
+    
+    for i in range(rows):
+        for j in range(columns):
+            if SE[i, j] == 1 and region[i, j] == 1:
+                return True
+    
+    return False
 
 def centerMatrix(matrix):
     """
