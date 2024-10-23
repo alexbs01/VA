@@ -134,6 +134,7 @@ def medianFilter(inImage, filterSize):
     
     return result
 
+
 ###########################
 # OPERADORES MORFOLÓGICOS #
 ###########################
@@ -269,3 +270,41 @@ def fill(inImage, seeds, SE=[], center=[]):
                     seeds.append([rowSeed + i - center[0], columnSeed + j - center[1]])
     
     return outImage
+
+
+#######################
+# DETECCIÓN DE BORDES #
+#######################
+
+def gradientImage(inImage, operator):
+    """
+    Implementar una función que permita obtener las componentes Gx y Gy del gradiente de una
+    imagen, pudiendo elegir entre los operadores de Roberts, CentralDiff (Diferencias centrales
+    de Prewitt/Sobel sin promedio: i.e. [-1, 0, 1] y transpuesto), Prewitt y Sobel
+    
+    operator: Permite seleccionar el operador utilizado mediante los valores: 'Roberts',
+    'CentralDiff', 'Prewitt' o 'Sobel'.
+    
+    Return
+    ----------
+    [gx, gy]: Componentes Gx y Gy del gradiente.
+    """
+    pass
+
+def LoG(inImage, sigma):
+    """
+    Implementar el filtro Laplaciano de Gaussiano que permita especificar el parámetro sigma de la
+    Gaussiana utilizada.
+    
+    sigma: Parámetro sigma de la Gaussiana.
+    """
+    pass
+
+def edgeCanny(inImage, sigma, tlow, thigh):
+    """
+    Implementar el detector de bordes de Canny
+    
+    sigma: Parámetro sigma del filtro Gaussiano.
+    tlow, thigh: Umbrales de histéresis bajo y alto, respectivamente.
+    """
+    pass
