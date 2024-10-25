@@ -5,6 +5,9 @@ import numpy as np
 import utils
 
 def main():
+    
+    imgOut = None
+    
     # Blur
     kernel01 = np.array([[1, 1, 1], 
                         [1, 1, 1], 
@@ -28,7 +31,7 @@ def main():
     se04 = np.array([[1, 1]])
     
     
-    img = cv2.imread('imagenesPrueba/image.png', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('imagenesPrueba/circles1.png', cv2.IMREAD_GRAYSCALE)
     img = ski.util.img_as_float(img)
     nbins = 256
     
@@ -41,8 +44,16 @@ def main():
     #imgOut = f.dilate(img, se02)                           # morph.png
     #imgOut = f.opening(img, se03)                          # morph.png
     #imgOut = f.closing(img, se01)                          # morph.png
-    imgOut = f.fill(img, [[30, 30]])                        # image.png
-    utils.show_imgs_and_histogram(img, imgOut, nbins)       
+    #imgOut = f.fill(img, [[30, 30]])                       # image.png
+    gradient = f.gradientImage(img, "Roberts")
+    
+    imgOut = f.filterImage(img, np.array([[-gradient[0], 0], [0, gradient[0]]]))
+    #imgOut = f.filterImage(img, np.array([[0, -gradient[0]], [gradient[0], 0]]))
+    
+    if imgOut is not None:
+        utils.show_imgs_and_histogram(img, imgOut, nbins)
+    else:
+        print("Gradient:", gradient)
 
 
 if __name__ == "__main__":

@@ -60,6 +60,38 @@ def centerMatrix(matrix):
     
     return [np.floor(rows // 2).astype(int), np.floor(columns // 2).astype(int)]
 
+def operatorRoberts(image):
+    rows, columns = image.shape
+    regionSize = np.zeros([3, 3])
+    
+    gx = 0
+    gy = 0
+    
+    for row in range(rows):
+        for column in range(columns):
+            region = getRegion(image, regionSize, row, column)
+            
+            gx += region[2, 2] - region[1, 1]
+            gy += region[2, 1] - region[1, 2]
+            
+    
+    print("gx:", gx)
+    print("gy:", gy)
+    gx /= rows * columns
+    gy /= rows * columns
+    print("gx:", gx)
+    print("gy:", gy)
+    return [gx, gy]
+
+def operatorCentralDiff(image):
+    pass
+
+def operatorPrewitt(image):
+    pass
+
+def operatorSobel(image):
+    pass
+
 def show_imgs_and_histogram(img01, img02, nbins=256):
     # Crear una figura con 2x2 subplots: dos para las imágenes y dos para los histogramas
     fig, axs = plt.subplots(2, 2, figsize=(12, 8))

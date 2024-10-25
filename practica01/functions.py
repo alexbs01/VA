@@ -289,7 +289,23 @@ def gradientImage(inImage, operator):
     ----------
     [gx, gy]: Componentes Gx y Gy del gradiente.
     """
-    pass
+    operator = operator.lower()
+    
+    gradient = np.zeros(shape=[1, 2])
+    
+    match operator:
+        case "roberts":
+            gradient = utils.operatorRoberts(inImage)
+        case "centraldiff":
+            gradient = utils.operatorCentralDiff(inImage)
+        case "prewitt":
+            gradient = utils.operatorPrewitt(inImage)
+        case "sobel":
+            gradient = utils.operatorSobel(inImage)
+        case _:
+            raise "Operator debe de ser Roberts, CentralDiff, Prewitt o Sobel"
+    
+    return gradient
 
 def LoG(inImage, sigma):
     """
