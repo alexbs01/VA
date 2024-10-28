@@ -45,15 +45,15 @@ def main():
     #imgOut = f.opening(img, se03)                          # morph.png
     #imgOut = f.closing(img, se01)                          # morph.png
     #imgOut = f.fill(img, [[30, 30]])                       # image.png
-    gradient = f.gradientImage(img, "Roberts")
+    gradient = f.gradientImage(img, "roberts")
     
-    imgOut = f.filterImage(img, np.array([[-gradient[0], 0], [0, gradient[0]]]))
-    #imgOut = f.filterImage(img, np.array([[0, -gradient[0]], [gradient[0], 0]]))
+    #imgOut = f.LoG(img, 1)
     
     if imgOut is not None:
         utils.show_imgs_and_histogram(img, imgOut, nbins)
     else:
         print("Gradient:", gradient)
+        utils.show_imgs_and_histogram(img, gradient[0] + gradient[1], nbins)
 
 
 if __name__ == "__main__":

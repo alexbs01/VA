@@ -70,8 +70,7 @@ def filterImage(inImage, kernel):
     for i in range(rows):
         for j in range(columns):
             region = utils.getRegion(inImage, kernel, i, j)
-            print(region.shape)
-            print(kernel.shape)
+
             result[i, j] = np.sum(region * kernel)
     
     outImage = np.clip(result, 0., 1.)
@@ -288,6 +287,8 @@ def gradientImage(inImage, operator):
     Return
     ----------
     [gx, gy]: Componentes Gx y Gy del gradiente.
+    
+    Usar atan2
     """
     operator = operator.lower()
     
@@ -309,12 +310,28 @@ def gradientImage(inImage, operator):
 
 def LoG(inImage, sigma):
     """
-    Implementar el filtro Laplaciano de Gaussiano que permita especificar el parámetro sigma de la
-    Gaussiana utilizada.
+    Implementa el filtro Laplaciano de Gauss (LoG).
     
-    sigma: Parámetro sigma de la Gaussiana.
+    Parámetros
+    ----------
+    - inImage: Imagen de entrada en escala de grises.
+    - sigma: Desviación estándar del filtro Gaussiano.
+    
+    Retorno
+    -------
+    - outImage: Imagen resultante después de aplicar el filtro LoG.
     """
-    pass
+    suavizada = gaussianFilter(inImage, sigma)
+    
+    laplaciano_kernel = np.array([[0, 1, 0], 
+                                [1, -4, 1], 
+                                [0, 1, 0]])
+    
+    outImage = filterImage(suavizada, laplaciano_kernel)
+    
+    outImage = np.clip(outImage, 0, 1)
+    
+    return outImage
 
 def edgeCanny(inImage, sigma, tlow, thigh):
     """
@@ -322,5 +339,8 @@ def edgeCanny(inImage, sigma, tlow, thigh):
     
     sigma: Parámetro sigma del filtro Gaussiano.
     tlow, thigh: Umbrales de histéresis bajo y alto, respectivamente.
+    1. Guassiana
+    2. Gradiente
+    3. Supresión no máxima
     """
     pass

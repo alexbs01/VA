@@ -62,35 +62,81 @@ def centerMatrix(matrix):
 
 def operatorRoberts(image):
     rows, columns = image.shape
-    regionSize = np.zeros([3, 3])
+    maskX = np.array([  [-1, 0], 
+                        [0, 1]])
+    maskY = np.array([  [0, -1],
+                        [1, 0]])
     
-    gx = 0
-    gy = 0
+    gx = np.zeros([rows, columns])
+    gy = np.zeros([rows, columns])
     
     for row in range(rows):
         for column in range(columns):
-            region = getRegion(image, regionSize, row, column)
+            region = getRegion(image, maskX, row, column)
             
-            gx += region[2, 2] - region[1, 1]
-            gy += region[2, 1] - region[1, 2]
-            
+            gx[row, column] = np.sum(region * maskX)
+            gy[row, column] = np.sum(region * maskY)
     
-    print("gx:", gx)
-    print("gy:", gy)
-    gx /= rows * columns
-    gy /= rows * columns
-    print("gx:", gx)
-    print("gy:", gy)
     return [gx, gy]
 
 def operatorCentralDiff(image):
-    pass
+    rows, columns = image.shape
+    maskX = np.array([  [-1, 0, 1]])
+    maskY = np.transpose(maskX)
+    
+    gx = np.zeros([rows, columns])
+    gy = np.zeros([rows, columns])
+    
+    for row in range(rows):
+        for column in range(columns):
+            region = getRegion(image, maskX, row, column)
+            
+            gx[row, column] = np.sum(region * maskX)
+            gy[row, column] = np.sum(region * maskY)
+    
+    return [gx, gy]
 
 def operatorPrewitt(image):
-    pass
+    rows, columns = image.shape
+    maskX = np.array([  [-1, 0, 1],
+                        [-1, 0, 1],
+                        [-1, 0, 1]])
+    maskY = np.array([  [-1, -1, -1],
+                        [0, 0, 0],
+                        [1, 1, 1]])
+    
+    gx = np.zeros([rows, columns])
+    gy = np.zeros([rows, columns])
+    
+    for row in range(rows):
+        for column in range(columns):
+            region = getRegion(image, maskX, row, column)
+            
+            gx[row, column] = np.sum(region * maskX)
+            gy[row, column] = np.sum(region * maskY)
+    
+    return [gx, gy]
 
 def operatorSobel(image):
-    pass
+    rows, columns = image.shape
+    maskX = np.array([  [-1, 0, 1],
+                        [-2, 0, 2],
+                        [-1, 0, 1]])
+    maskY = np.array([  [-1, -2, -1],
+                        [0, 0, 0],
+                        [1, 2, 1]])
+    
+    gx = np.zeros([rows, columns])
+    gy = np.zeros([rows, columns])
+    
+    for row in range(rows):
+        for column in range(columns):
+            region = getRegion(image, maskX, row, column)
+            
+            gx[row, column] = np.sum(region * maskX)
+            gy[row, column] = np.sum(region * maskY)
+    
+    return [gx, gy]
 
 def show_imgs_and_histogram(img01, img02, nbins=256):
     # Crear una figura con 2x2 subplots: dos para las imágenes y dos para los histogramas
