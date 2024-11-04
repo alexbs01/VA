@@ -342,5 +342,28 @@ def edgeCanny(inImage, sigma, tlow, thigh):
     1. Guassiana
     2. Gradiente
     3. Supresión no máxima
+    4. Histéresis
     """
-    pass
+    image = np.copy(inImage)
+    
+    image = gaussianFilter(image, sigma)
+    
+    jx, jy = gradientImage(image, "Sobel")
+    
+    gradientDirection = np.atan2(jy, jx)
+    gradientMagnitude = np.sqrt(jx**2 + jy**2)
+    
+    for row in gradientMagnitude:
+        for col in row:
+            print(np.round(col, decimals=2), end="\t")
+        print()
+    
+    gradientMagnitude = utils.NMS(gradientDirection, gradientMagnitude)
+    
+    for row in gradientMagnitude:
+        for col in row:
+            print(np.round(col, decimals=2), end="\t")
+        print()
+        
+        
+    return gradientMagnitude

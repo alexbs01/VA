@@ -138,6 +138,64 @@ def operatorSobel(image):
     
     return [gx, gy]
 
+def getGradientDirection(elementGradientDirection):
+    angle = (2 * np.pi) / 16
+    
+    if elementGradientDirection <= angle and elementGradientDirection > -angle or \
+        elementGradientDirection <= 9 * angle and elementGradientDirection > 7 * angle:
+        return "horizontal"
+    
+    elif elementGradientDirection <= 3 * angle and elementGradientDirection > angle or \
+        elementGradientDirection <= 11 * angle and elementGradientDirection > 9 * angle:
+        return "first-quadrant"
+    
+    elif elementGradientDirection <= 5 * angle and elementGradientDirection > 3 * angle or \
+        elementGradientDirection <= 13 * angle and elementGradientDirection > 11 * angle:
+        return "vertical"
+    
+    elif elementGradientDirection <= 7 * angle and elementGradientDirection > 5 * angle or \
+        elementGradientDirection <= 15 * angle and elementGradientDirection > 13 * angle:
+        return "second-quadrant"
+    
+    else:
+        return "horizontal"
+
+def NMS(gradientDirection, gradientMagnitude):
+    rows, cols = gradientMagnitude.shape
+    print("NMS", rows, cols)
+    
+    for i in range(rows):
+        for j in range(cols):
+            elementGradientDirection = getGradientDirection(gradientDirection[i, j])
+            
+            if elementGradientDirection == "horizontal":
+                if j + 1 < cols and gradientMagnitude[i, j] < gradientMagnitude[i, j + 1] or \
+                    j - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i, j - 1]:
+                    gradientMagnitude[i, j] = 0
+                    print("H", end="")
+                
+            elif elementGradientDirection == "first-quadrant":
+                if i - 1 >= 0 and j + 1 < cols and gradientMagnitude[i, j] < gradientMagnitude[i - 1, j + 1] or \
+                    i + 1 < rows and j - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i + 1, j - 1]:
+                    gradientMagnitude[i, j] = 0
+                    print("1", end="")
+                
+            elif elementGradientDirection == "vertical":
+                if i - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i - 1, j] or \
+                    i + 1 < rows and gradientMagnitude[i, j] < gradientMagnitude[i + 1, j]:
+                    gradientMagnitude[i, j] = 0
+                    print("V", end="")
+                
+            elif elementGradientDirection == "second-quadrant":
+                if i - 1 >= 0 and j - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i - 1, j - 1] or \
+                    i + 1 < rows and j + 1 < cols and gradientMagnitude[i, j] < gradientMagnitude[i + 1, j + 1]:
+                    gradientMagnitude[i, j] = 0
+                    print("2", end="")
+            
+        print()
+    
+    return gradientMagnitude
+
 def show_imgs_and_histogram(img01, img02, nbins=256):
     # Crear una figura con 2x2 subplots: dos para las imágenes y dos para los histogramas
     fig, axs = plt.subplots(2, 2, figsize=(12, 8))
