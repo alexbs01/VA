@@ -52,7 +52,7 @@ def main():
     #imgOut = f.fill(img, [[30, 30]])                       # image.png
     #gradient = f.gradientImage(img, "sobel")
     #imgOut = f.LoG(img, 1)
-    imgOut = f.edgeCanny(img, 1, 0.01, 0.4)
+    imgOut = f.edgeCanny(img, 1, 0.07, 0.2)
     
     
     

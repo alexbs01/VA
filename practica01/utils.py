@@ -196,68 +196,61 @@ def hysteresis(image, gradientDirection, tlow, thigh):
     img = np.copy(image)
     
     edgeVisited = set()
+    softEdges = set()
     
     for i in range(rows):
         for j in range(cols):
             if img[i, j] >= thigh:
-                if (i, j) in edgeVisited:
-                    continue
                 edgeVisited.add((i, j))
-                elementGradientDirection = getGradientDirection(gradientDirection[i, j])
+            
+            elif tlow >= img[i, j] > thigh:
+                softEdges.add((i, j))
+    
+    for i, j in edgeVisited:
+            elementGradientDirection = getGradientDirection(gradientDirection[i, j])
+            
+            if elementGradientDirection == "horizontal":
+                for k in range(i + 1, rows):
+                    if (k, j) in softEdges:
+                        edgeVisited.add((k, j))
+                for k in range(i - 1, -1, -1):
+                    if (k, j) in softEdges:
+                        edgeVisited.add((k, j))
                 
-                if elementGradientDirection == "horizontal":
-                    for k in range(i + 1, rows):
-                        if img[k, j] > tlow:
-                            edgeVisited.add((k, j))
-                        else:
-                            break
-                    for k in range(i - 1, -1, -1):
-                        if img[k, j] > tlow:
-                            edgeVisited.add((k, j))
-                        else:
-                            break
+            elif elementGradientDirection == "first-quadrant":
+                for k in range(1, min(i + 1, cols - j)):
+                    if (i - k, j + k) in softEdges:
+                        edgeVisited.add((i - k, j + k))
                     
-                elif elementGradientDirection == "first-quadrant":
-                    for k in range(1, min(i + 1, cols - j)):
-                        if img[i - k, j + k] > tlow:
-                            edgeVisited.add((i - k, j + k))
-                        else:
-                            break
-                        
-                    for k in range(1, min(rows - i, j + 1)):
-                        if img[i + k, j - k] > tlow:
-                            edgeVisited.add((i + k, j - k))
-                        else:
-                            break
-                    
-                elif elementGradientDirection == "vertical":
-                    for k in range(j + 1, cols):
-                        if img[i, k] > tlow:
-                            edgeVisited.add((i, k))
-                        else:
-                            break
-                    for k in range(j - 1, -1, -1):
-                        if img[i, k] > tlow:
-                            edgeVisited.add((i, k))
-                        else:
-                            break
-                    
-                elif elementGradientDirection == "second-quadrant":
-                    for k in range(1, min(rows - i, cols - j)):
-                        if img[i + k, j + k] > tlow:
-                            edgeVisited.add((i + k, j + k))
-                        else:
-                            break
-                    for k in range(1, min(i, j)):
-                        if img[i - k, j - k] > tlow:
-                            edgeVisited.add((i - k, j - k))
-                        else:
-                            break
+                for k in range(1, min(rows - i, j + 1)):
+                    if (i + k, j - k) in softEdges:
+                        edgeVisited.add((i + k, j - k))
+                
+            elif elementGradientDirection == "vertical":
+                for k in range(j + 1, cols):
+                    if (i, k) in softEdges:
+                        edgeVisited.add((i, k))
+                for k in range(j - 1, -1, -1):
+                    if (i, k) in softEdges:
+                        edgeVisited.add((i, k))
+                
+            elif elementGradientDirection == "second-quadrant":
+                for k in range(1, min(rows - i, cols - j)):
+                    if (i + k, j + k) in softEdges:
+                        edgeVisited.add((i + k, j + k))
+
+                for k in range(1, min(i, j)):
+                    if (i - k, j - k) in softEdges:
+                        edgeVisited.add((i - k, j - k))
     
     img = np.zeros(img.shape)
     
     for (i, j) in edgeVisited:
         img[i, j] = 1
+    
+    for (i, j) in softEdges:
+        img[i, j] = 0.5
+        print(i, j)
 
     
     
