@@ -38,7 +38,7 @@ def main():
     #imgOut = f.adjustIntensity(img, [0.4, 0.60], [0., 1.])
     #imgOut = f.equalizeIntensity(img, nbins)               # eq0.png
     #imgOut = f.filterImage(img, kernel02)
-    #imgOut = f.gaussianFilter(img, 0.1)                      # grid.png
+    #imgOut = f.gaussianFilter(img, 3)                      # grid.png
     #imgOut = f.medianFilter(img, 3)                        # grid.png
     #imgOut = f.erode(img, se02)                            # morph.png
     #imgOut = f.dilate(img, se02)               rcles.png', cv2.IMREAD_GRAYSCALE)
@@ -52,7 +52,7 @@ def main():
     #imgOut = f.fill(img, [[30, 30]])                       # image.png
     #gradient = f.gradientImage(img, "sobel")
     #imgOut = f.LoG(img, 1)
-    imgOut = f.edgeCanny(img, 0.001, 0.5, 0.5)
+    imgOut = f.edgeCanny(img, 0.001, 0.01, 0.7)
     
     
     

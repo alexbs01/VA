@@ -91,7 +91,7 @@ def gaussKernel1D(sigma):
         - N se calcula a partir de σ como N = 2⌈3σ⌉ + 1
     """
 
-    N = 2 * np.ceil(3 * sigma) + 1
+    N = int(2 * np.ceil(3 * sigma) + 1)
     x = np.arange(-N // 2, N // 2 + 1)
     kernel = np.exp(-x**2 / (2 * sigma**2))
     kernel /= np.sum(kernel)
@@ -344,6 +344,8 @@ def edgeCanny(inImage, sigma, tlow, thigh):
     3. Supresión no máxima
     4. Histéresis
     """
+    assert tlow <= thigh, "tlow must be less than thigh"
+    
     image = np.copy(inImage)
     
     image = gaussianFilter(image, sigma)
@@ -353,17 +355,8 @@ def edgeCanny(inImage, sigma, tlow, thigh):
     gradientDirection = np.atan2(jy, jx)
     gradientMagnitude = np.sqrt(jx**2 + jy**2)
     
-    for row in gradientMagnitude:
-        for col in row:
-            print(np.round(col, decimals=2), end="\t")
-        print()
+    beforeHysteresis = utils.NMS(gradientDirection, gradientMagnitude)
     
-    gradientMagnitude = utils.NMS(gradientDirection, gradientMagnitude)
-    
-    for row in gradientMagnitude:
-        for col in row:
-            print(np.round(col, decimals=2), end="\t")
-        print()
+    afterHysteresis = utils.hysteresis(beforeHysteresis, gradientDirection, tlow, thigh)
         
-        
-    return gradientMagnitude
+    return afterHysteresis
