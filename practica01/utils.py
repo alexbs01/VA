@@ -196,7 +196,6 @@ def hysteresis(image, gradientDirection, tlow, thigh):
     img = np.copy(image)
     
     edgeVisited = set()
-    edgeToVisit = set()
     
     for i in range(rows):
         for j in range(cols):
@@ -209,92 +208,55 @@ def hysteresis(image, gradientDirection, tlow, thigh):
                 if elementGradientDirection == "horizontal":
                     for k in range(i + 1, rows):
                         if img[k, j] > tlow:
-                            if getGradientDirection != "horizontal":
-                                edgeToVisit.add((k, j))
-                                print((k, j))
-                            else:
-                                edgeVisited.add((k, j))
+                            edgeVisited.add((k, j))
                         else:
                             break
                     for k in range(i - 1, -1, -1):
                         if img[k, j] > tlow:
-                            if getGradientDirection != "horizontal":
-                                edgeToVisit.add((k, j))
-                                print((k, j))
-                            else:
-                                edgeVisited.add((k, j))
+                            edgeVisited.add((k, j))
                         else:
                             break
                     
                 elif elementGradientDirection == "first-quadrant":
                     for k in range(1, min(i + 1, cols - j)):
                         if img[i - k, j + k] > tlow:
-                            if getGradientDirection != "first-quadrant":
-                                edgeToVisit.add((i - k, j + k))
-                                print((i - k, j + k))
-                            else:
-                                edgeVisited.add((i - k, j + k))
+                            edgeVisited.add((i - k, j + k))
                         else:
                             break
                         
                     for k in range(1, min(rows - i, j + 1)):
                         if img[i + k, j - k] > tlow:
-                            if getGradientDirection != "first-quadrant":
-                                edgeToVisit.add((i + k, j - k))
-                                print((i - k, j + k))
-                            else:
-                                edgeVisited.add((i + k, j - k))
+                            edgeVisited.add((i + k, j - k))
                         else:
                             break
                     
                 elif elementGradientDirection == "vertical":
                     for k in range(j + 1, cols):
                         if img[i, k] > tlow:
-                            if getGradientDirection(gradientDirection[i, k]) != "vertical":
-                                edgeToVisit.add((i, k))
-                                print((i, k))
-                            else:
-                                edgeVisited.add((i, k))
+                            edgeVisited.add((i, k))
                         else:
                             break
                     for k in range(j - 1, -1, -1):
                         if img[i, k] > tlow:
-                            if getGradientDirection(gradientDirection[i, k]) != "vertical":
-                                edgeToVisit.add((i, k))
-                                print((i, k))
-                            else:
-                                edgeVisited.add((i, k))
+                            edgeVisited.add((i, k))
                         else:
                             break
                     
                 elif elementGradientDirection == "second-quadrant":
                     for k in range(1, min(rows - i, cols - j)):
                         if img[i + k, j + k] > tlow:
-                            if getGradientDirection != "second-quadrant":
-                                edgeToVisit.add((i + k, j + k))
-                                print((i + k, j + k))
-                            else:
-                                edgeVisited.add((i + k, j + k))
+                            edgeVisited.add((i + k, j + k))
                         else:
                             break
                     for k in range(1, min(i, j)):
                         if img[i - k, j - k] > tlow:
-                            if getGradientDirection != "second-quadrant":
-                                edgeToVisit.add((i - k, j - k))
-                                print((i - k, j - k))
-                            else:
-                                edgeVisited.add((i - k, j - k))
+                            edgeVisited.add((i - k, j - k))
                         else:
                             break
     
     img = np.zeros(img.shape)
     
     for (i, j) in edgeVisited:
-        img[i, j] = 1
-    
-    for (i, j) in edgeToVisit:
-        if (i, j) not in edgeVisited:
-            print("hhhhhh", i, j)
         img[i, j] = 1
 
     
