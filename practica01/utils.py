@@ -190,70 +190,59 @@ def NMS(gradientDirection, gradientMagnitude):
     
     return gradientMagnitude
 
-def hysteresis(image, gradientDirection, tlow, thigh):
-    rows, cols = image.shape
-    
-    img = np.copy(image)
-    
-    edgeVisited = set()
+def getStrenghtAndSoftEdges(img, tlow, thigh):
+    rows, cols = img.shape
+    strengthEdges = set()
     softEdges = set()
     
     for i in range(rows):
         for j in range(cols):
             if img[i, j] >= thigh:
-                edgeVisited.add((i, j))
-            
-            elif tlow >= img[i, j] > thigh:
+                strengthEdges.add((i, j))
+            elif tlow <= img[i, j] < thigh:
                 softEdges.add((i, j))
     
-    for i, j in edgeVisited:
-            elementGradientDirection = getGradientDirection(gradientDirection[i, j])
-            
-            if elementGradientDirection == "horizontal":
-                for k in range(i + 1, rows):
-                    if (k, j) in softEdges:
-                        edgeVisited.add((k, j))
-                for k in range(i - 1, -1, -1):
-                    if (k, j) in softEdges:
-                        edgeVisited.add((k, j))
-                
-            elif elementGradientDirection == "first-quadrant":
-                for k in range(1, min(i + 1, cols - j)):
-                    if (i - k, j + k) in softEdges:
-                        edgeVisited.add((i - k, j + k))
-                    
-                for k in range(1, min(rows - i, j + 1)):
-                    if (i + k, j - k) in softEdges:
-                        edgeVisited.add((i + k, j - k))
-                
-            elif elementGradientDirection == "vertical":
-                for k in range(j + 1, cols):
-                    if (i, k) in softEdges:
-                        edgeVisited.add((i, k))
-                for k in range(j - 1, -1, -1):
-                    if (i, k) in softEdges:
-                        edgeVisited.add((i, k))
-                
-            elif elementGradientDirection == "second-quadrant":
-                for k in range(1, min(rows - i, cols - j)):
-                    if (i + k, j + k) in softEdges:
-                        edgeVisited.add((i + k, j + k))
+    return strengthEdges, softEdges
 
-                for k in range(1, min(i, j)):
-                    if (i - k, j - k) in softEdges:
-                        edgeVisited.add((i - k, j - k))
+def searchStrengthEdges(strengthEdges, softEdges, gradientDirection):
+    queue = list(strengthEdges)
+
+    while queue:
+        i, j = queue.pop(0)
+        elementGradientDirection = getGradientDirection(gradientDirection[i, j])
+
+        if elementGradientDirection == "horizontal":
+            neighbors = [(i, j + 1), (i, j - 1)]
+        
+        elif elementGradientDirection == "first-quadrant":
+            neighbors = [(i - 1, j + 1), (i + 1, j - 1)]
+        
+        elif elementGradientDirection == "vertical":
+            neighbors = [(i - 1, j), (i + 1, j)]
+        
+        elif elementGradientDirection == "second-quadrant":
+            neighbors = [(i + 1, j + 1), (i - 1, j - 1)]
+
+        for ni, nj in neighbors:
+            if (ni, nj) in softEdges:
+                strengthEdges.add((ni, nj))
+                softEdges.remove((ni, nj))
+                queue.append((ni, nj))
     
+    return strengthEdges, softEdges
+
+def hysteresis(image, gradientDirection, tlow, thigh):
+    img = np.copy(image)
+    strengthEdges, softEdges = getStrenghtAndSoftEdges(img, tlow, thigh)
+
+    strengthEdges, softEdges = searchStrengthEdges(strengthEdges, softEdges, gradientDirection)
+
     img = np.zeros(img.shape)
-    
-    for (i, j) in edgeVisited:
+    for (i, j) in strengthEdges:
         img[i, j] = 1
-    
     for (i, j) in softEdges:
-        img[i, j] = 0.5
-        print(i, j)
+        img[i, j] = 0.0
 
-    
-    
     return img
 
 def show_imgs_and_histogram(img01, img02, nbins=256):
