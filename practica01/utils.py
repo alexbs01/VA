@@ -25,7 +25,7 @@ def histogram(inImage, nBins=256):
 def getRegion(image, kernel, i, j):
     rows_kernel, columns_kernel = kernel.shape
     
-    imagePadded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), constant_values=0, mode='constant')
+    imagePadded = np.pad(image, ((rows_kernel // 2, rows_kernel // 2), (columns_kernel // 2, columns_kernel // 2)), mode="reflect")
     
     return imagePadded[i:i + rows_kernel, j:j + columns_kernel]
 
@@ -164,6 +164,8 @@ def NMS(gradientDirection, gradientMagnitude):
     rows, cols = gradientMagnitude.shape
     print("NMS", rows, cols)
     
+    arrayMagnitude = np.copy(gradientMagnitude)
+    
     for i in range(rows):
         for j in range(cols):
             elementGradientDirection = getGradientDirection(gradientDirection[i, j])
@@ -171,24 +173,25 @@ def NMS(gradientDirection, gradientMagnitude):
             if elementGradientDirection == "horizontal":
                 if (j + 1 < cols and gradientMagnitude[i, j] < gradientMagnitude[i, j + 1]) or \
                     (j - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i, j - 1]):
-                    gradientMagnitude[i, j] = 0
+                    arrayMagnitude[i, j] = 0
                 
             elif elementGradientDirection == "first-quadrant":
                 if (i - 1 >= 0 and j - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i - 1, j - 1]) or \
                     (i + 1 < rows and j + 1 < cols and gradientMagnitude[i, j] < gradientMagnitude[i + 1, j + 1]):
-                    gradientMagnitude[i, j] = 0
+                    arrayMagnitude[i, j] = 0
                 
             elif elementGradientDirection == "vertical":
                 if (i - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i - 1, j]) or \
                     (i + 1 < rows and gradientMagnitude[i, j] < gradientMagnitude[i + 1, j]):
-                    gradientMagnitude[i, j] = 0
+                    arrayMagnitude[i, j] = 0
                 
             elif elementGradientDirection == "second-quadrant":
                 if (i - 1 >= 0 and j + 1 < cols and gradientMagnitude[i, j] < gradientMagnitude[i - 1, j + 1]) or \
                     (i + 1 < rows and j - 1 >= 0 and gradientMagnitude[i, j] < gradientMagnitude[i + 1, j - 1]):
-                    gradientMagnitude[i, j] = 0
+                    arrayMagnitude[i, j] = 0
     
-    return gradientMagnitude
+    return arrayMagnitude
+
 
 def getStrenghtAndSoftEdges(img, tlow, thigh):
     rows, cols = img.shape
@@ -214,14 +217,20 @@ def searchStrengthEdges(strengthEdges, softEdges, gradientDirection):
         if elementGradientDirection == "horizontal":
             neighbors = [(i, j + 1), (i, j - 1)]
         
-        elif elementGradientDirection == "first-quadrant":
-            neighbors = [(i - 1, j + 1), (i + 1, j - 1)]
+        elif elementGradientDirection == "first-quadrant" and gradientDirection[i, j] >= 0:
+            neighbors = [(i + 1, j + 1)]
+        
+        elif elementGradientDirection == "first-quadrant" and gradientDirection[i, j] < 0:
+            neighbors = [(i - 1, j - 1)]
         
         elif elementGradientDirection == "vertical":
             neighbors = [(i - 1, j), (i + 1, j)]
         
-        elif elementGradientDirection == "second-quadrant":
-            neighbors = [(i + 1, j + 1), (i - 1, j - 1)]
+        elif elementGradientDirection == "second-quadrant" and gradientDirection[i, j] >= 0:
+            neighbors = [(i + 1, j - 1)]
+        
+        elif elementGradientDirection == "second-quadrant" and gradientDirection[i, j] < 0:
+            neighbors = [(i - 1, j + 1)]
 
         for ni, nj in neighbors:
             if (ni, nj) in softEdges:
@@ -241,7 +250,7 @@ def hysteresis(image, gradientDirection, tlow, thigh):
     for (i, j) in strengthEdges:
         img[i, j] = 1
     for (i, j) in softEdges:
-        img[i, j] = 0.0
+        img[i, j] = 0.5
 
     return img
 

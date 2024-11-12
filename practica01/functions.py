@@ -65,15 +65,14 @@ def filterImage(inImage, kernel):
     """
     rows, columns = inImage.shape
     
-    result = np.zeros((rows, columns))
+    outImage = np.zeros((rows, columns))
     
     for i in range(rows):
         for j in range(columns):
             region = utils.getRegion(inImage, kernel, i, j)
 
-            result[i, j] = np.sum(region * kernel)
-    
-    outImage = np.clip(result, 0., 1.)
+            outImage[i, j] = np.sum(region * kernel)
+
     
     return outImage
 
@@ -323,13 +322,11 @@ def LoG(inImage, sigma):
     """
     suavizada = gaussianFilter(inImage, sigma)
     
-    laplaciano_kernel = np.array([[0, 1, 0], 
-                                [1, -4, 1], 
-                                [0, 1, 0]])
+    laplaciano_kernel = np.array([[1, 1, 1], 
+                                [1, -8, 1], 
+                                [1, 1, 1]])
     
     outImage = filterImage(suavizada, laplaciano_kernel)
-    
-    outImage = np.clip(outImage, 0, 1)
     
     return outImage
 
