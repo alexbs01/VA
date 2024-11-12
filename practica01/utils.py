@@ -207,50 +207,33 @@ def getStrenghtAndSoftEdges(img, tlow, thigh):
     
     return strengthEdges, softEdges
 
-def searchStrengthEdges(strengthEdges, softEdges, gradientDirection):
+def searchStrengthEdges(strengthEdges, softEdges):
     queue = list(strengthEdges)
 
+    neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
+    
     while queue:
         i, j = queue.pop(0)
-        elementGradientDirection = getGradientDirection(gradientDirection[i, j])
 
-        if elementGradientDirection == "horizontal":
-            neighbors = [(i, j + 1), (i, j - 1)]
-        
-        elif elementGradientDirection == "first-quadrant" and gradientDirection[i, j] >= 0:
-            neighbors = [(i + 1, j + 1)]
-        
-        elif elementGradientDirection == "first-quadrant" and gradientDirection[i, j] < 0:
-            neighbors = [(i - 1, j - 1)]
-        
-        elif elementGradientDirection == "vertical":
-            neighbors = [(i - 1, j), (i + 1, j)]
-        
-        elif elementGradientDirection == "second-quadrant" and gradientDirection[i, j] >= 0:
-            neighbors = [(i + 1, j - 1)]
-        
-        elif elementGradientDirection == "second-quadrant" and gradientDirection[i, j] < 0:
-            neighbors = [(i - 1, j + 1)]
-
-        for ni, nj in neighbors:
-            if (ni, nj) in softEdges:
-                strengthEdges.add((ni, nj))
-                softEdges.remove((ni, nj))
-                queue.append((ni, nj))
+        for di, dj in neighbors:
+            neighborI, neighborJ = i + di, j + dj
+            
+            if (neighborI, neighborJ) in softEdges:
+                strengthEdges.add((neighborI, neighborJ))
+                softEdges.remove((neighborI, neighborJ))
+                queue.append((neighborI, neighborJ))
     
     return strengthEdges, softEdges
 
-def hysteresis(image, gradientDirection, tlow, thigh):
+def hysteresis(image, tlow, thigh):
     img = np.copy(image)
     strengthEdges, softEdges = getStrenghtAndSoftEdges(img, tlow, thigh)
 
-    strengthEdges, softEdges = searchStrengthEdges(strengthEdges, softEdges, gradientDirection)
+    strengthEdges, softEdges = searchStrengthEdges(strengthEdges, softEdges)
 
     img = np.zeros(img.shape)
     for (i, j) in strengthEdges:
         img[i, j] = 1
-    for (i, j) in softEdges:
-        img[i, j] = 0.5
 
     return img
 
