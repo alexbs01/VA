@@ -350,7 +350,7 @@ def edgeCanny(inImage, sigma, tlow, thigh):
     jx, jy = gradientImage(image, "Sobel")
     
     gradientDirection = np.atan2(jy, jx)
-    gradientMagnitude = np.sqrt(jx**2 + jy**2)
+    gradientMagnitude = np.hypot(jx, jy)
     
     beforeHysteresis = utils.NMS(gradientDirection, gradientMagnitude)
     

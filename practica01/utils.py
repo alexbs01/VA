@@ -139,7 +139,13 @@ def operatorSobel(image):
     return [gx, gy]
 
 def getGradientDirection(elementGradientDirection):
-    angle = (2 * np.pi) / 16
+    """
+    elementGradientDirection: Dirección del gradiente de un elemento
+    La dirección del gradiente se divide en 8 partes.
+    Las direcciones negativas se convierten en positivas.
+    En función del ángulo, se clasifica en horizontal, primer cuadrante, vertical y segundo cuadrante.
+    """
+    angle = np.pi / 8
     
     if elementGradientDirection < 0:
         elementGradientDirection += np.pi
@@ -161,6 +167,16 @@ def getGradientDirection(elementGradientDirection):
     
 
 def NMS(gradientDirection, gradientMagnitude):
+    """
+    Supresión no máxima
+    
+    Elimina los píxeles que no son máximos en la dirección del gradiente.
+    Crea bordes de un píxel de ancho.
+    Para un borde horizontal, se comparan los píxeles de izquierda y derecha.
+    Para un borde del primer cuadrante, se comparan los píxeles de la esquina superior izquierda y la esquina inferior derecha.
+    Para un borde vertical, se comparan los píxeles de arriba y abajo.
+    Para un borde del segundo cuadrante, se comparan los píxeles de la esquina superior derecha y la esquina inferior izquierda
+    """
     rows, cols = gradientMagnitude.shape
     print("NMS", rows, cols)
     
@@ -192,8 +208,10 @@ def NMS(gradientDirection, gradientMagnitude):
     
     return arrayMagnitude
 
-
 def getStrenghtAndSoftEdges(img, tlow, thigh):
+    """
+    Indicando el thigh y tlow, se obtienen los bordes fuertes y suaves en dos sets
+    """
     rows, cols = img.shape
     strengthEdges = set()
     softEdges = set()
@@ -208,6 +226,10 @@ def getStrenghtAndSoftEdges(img, tlow, thigh):
     return strengthEdges, softEdges
 
 def searchStrengthEdges(strengthEdges, softEdges):
+    """
+    Cada borde fuerte se expande a los píxeles vecinos que son bordes suaves.
+    Se usa una vecindad de 8
+    """
     queue = list(strengthEdges)
 
     neighbors = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
@@ -215,8 +237,8 @@ def searchStrengthEdges(strengthEdges, softEdges):
     while queue:
         i, j = queue.pop(0)
 
-        for di, dj in neighbors:
-            neighborI, neighborJ = i + di, j + dj
+        for ni, nj in neighbors:
+            neighborI, neighborJ = i + ni, j + nj
             
             if (neighborI, neighborJ) in softEdges:
                 strengthEdges.add((neighborI, neighborJ))
@@ -226,6 +248,9 @@ def searchStrengthEdges(strengthEdges, softEdges):
     return strengthEdges, softEdges
 
 def hysteresis(image, tlow, thigh):
+    """
+    Realiza la histéresis en la images usando el thigh y e tlow
+    """
     img = np.copy(image)
     strengthEdges, softEdges = getStrenghtAndSoftEdges(img, tlow, thigh)
 
