@@ -355,5 +355,5 @@ def edgeCanny(inImage, sigma, tlow, thigh):
     beforeHysteresis = utils.NMS(gradientDirection, gradientMagnitude)
     
     afterHysteresis = utils.hysteresis(beforeHysteresis, tlow, thigh)
-        
+    
     return afterHysteresis
