@@ -1,5 +1,25 @@
 import matplotlib.pyplot as plt
 import cv2
+import numpy as np
+
+def maskField(img):
+    imgRed = img[:, :, 0]
+    imgGreen = img[:, :, 1]
+    imgBlue = img[:, :, 2]
+    
+    threshold_green = 10
+    mask_green = (imgGreen > imgRed + threshold_green) & (imgGreen > imgBlue + threshold_green)
+    mask_green = mask_green.astype(np.uint8) * 255
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5), anchor=(4, 0))
+    mask_green = cv2.erode(mask_green, kernel=kernel, iterations=7)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
+    mask_filled = cv2.morphologyEx(mask_green, cv2.MORPH_CLOSE, kernel, iterations=7)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7), anchor=(0, 4))
+    mask_aumented = cv2.dilate(mask_filled, kernel, iterations=7)
+    
+    return mask_aumented
 
 def drawPlayers(img, contours):
     imgOut = img.copy()
@@ -11,10 +31,10 @@ def drawPlayers(img, contours):
         # Calcular el área del contorno
         area = cv2.contourArea(contour)
         
-        if 30*30 < area < 400*400:  # Umbral de área mínimo y máximo para rectángulos pequeños
-            x, y, w, h = cv2.boundingRect(contour)  # Obtener el rectángulo delimitador
+        if 20*20 < area < 500*500:
+            x, y, w, h = cv2.boundingRect(contour)
             print(w, h)
-            if height * 0.05 < h < height * 0.3 and width * 0.03 < w < width * 0.2 and w < h * 1.2:
+            if w < h * 1.3 and 20 < w < 500 and 20 < h < 500:
                 cv2.rectangle(imgOut, (x, y), (x + w, y + h), (255, 0, 0), 2)
     
     return imgOut
