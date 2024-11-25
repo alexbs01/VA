@@ -7,6 +7,7 @@ import matplotlib.image as mpimg
 
 def main():
     img = mpimg.imread('practica02/img/100.jpg')
+
     imgRed = img[:, :, 0]
     imgGreen = img[:, :, 1]
     imgBlue = img[:, :, 2]
@@ -32,9 +33,17 @@ def main():
     #utils.show_imgs([imgRed, imgGreen, imgBlue])
     #utils.show_imgs([imgRG, imgGB, imgBR])
     #utils.show_imgs([imgRed_eq, imgGreen_eq, imgBlue_eq])
-    #utils.show_imgs([img, img_eq])
     
     imgOut = f.detectField(img)
+    
+    #playersContours = f.findPlayers(imgOut)
+    #imgOut = utils.drawPlayers(imgOut, playersContours)
+
+    #imgGray = ski.util.img_as_float(imgGray)
+    #imgEqualized = cv2.equalizeHist(imgOut)
+    
+    #imgEqualized = cv2.equalizeHist(imgOut)
+    
     utils.show_imgs([img, imgOut])
     
         
