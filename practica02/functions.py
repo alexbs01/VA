@@ -4,10 +4,7 @@ import utils
 
 def detectField(img):
     mask_filled = utils.maskField(img)
-    
-    #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 30))
-    #mask_filled = cv2.morphologyEx(mask_filled, cv2.MORPH_CLOSE, kernel, iterations=5)
-
+    #return mask_filled
     img_green_filled = img.copy()
     img_green_filled[mask_filled == 0] = [0, 0, 0]
     
@@ -26,7 +23,7 @@ def findPlayers(img):
 
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
     mask_green = cv2.morphologyEx(mask_green, cv2.MORPH_CLOSE, kernel, iterations=1)
-
+    
     img_green_filled = img.copy()
     img_green_filled[mask_green == 0] = [0, 0, 0]
 

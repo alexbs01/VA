@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 
-def maskField(img):
+def maskField(image):
+    img = np.copy(image)
+    img = cv2.GaussianBlur(img, (5, 5), 0)
     imgRed = img[:, :, 0]
     imgGreen = img[:, :, 1]
     imgBlue = img[:, :, 2]
@@ -15,9 +17,9 @@ def maskField(img):
     
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
     mask_filled = cv2.morphologyEx(mask_green, cv2.MORPH_CLOSE, kernel, iterations=7)
-
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7), anchor=(0, 4))
-    mask_aumented = cv2.dilate(mask_filled, kernel, iterations=7)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (30, 3), anchor=(15, 0))
+    mask_aumented = cv2.dilate(mask_filled, kernel, iterations=5)
     
     return mask_aumented
 

@@ -6,7 +6,7 @@ import utils
 import matplotlib.image as mpimg
 
 def main():
-    img = mpimg.imread('practica02/img/100.jpg')
+    img = mpimg.imread('practica02/img/33.jpg')
 
     imgRed = img[:, :, 0]
     imgGreen = img[:, :, 1]
