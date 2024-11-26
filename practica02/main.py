@@ -36,8 +36,8 @@ def main():
     
     imgOut = f.detectField(img)
     
-    #playersContours = f.findPlayers(imgOut)
-    #imgOut = utils.drawPlayers(imgOut, playersContours)
+    playersContours = f.findPlayers(imgOut)
+    imgOut = utils.drawPlayers(imgOut, playersContours)
 
     #imgGray = ski.util.img_as_float(imgGray)
     #imgEqualized = cv2.equalizeHist(imgOut)
