@@ -10,27 +10,30 @@ def detectField(img):
     
     return img_green_filled
 
-def findPlayers(img):
-    imgRed = img[:, :, 0]
-    imgGreen = img[:, :, 1]
-    imgBlue = img[:, :, 2]
+def findPlayers(image):
+    img = cv2.GaussianBlur(image, (5, 5), 0)
+    # Convertir la imagen al espacio de color HSV
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     
-    threshold_green = 0
-    mask_green = (imgGreen > imgRed + threshold_green) & (imgGreen > imgBlue + threshold_green)
-    mask_green = mask_green.astype(np.uint8) * 255
+    # Rango de valores para el color verde (puedes ajustarlo según el campo)
+    lower_green = np.array([35, 20, 20])  # Mínimo para verde
+    upper_green = np.array([85, 255, 255])  # Máximo para verde
+    
+    # Crear una máscara para el color verde
+    mask_green = cv2.inRange(hsv, lower_green, upper_green)
+    
+    # Invertir la máscara para detectar regiones no verdes (potenciales jugadores)
+    mask_players = cv2.bitwise_not(mask_green)
+    
+    # Aplicar operaciones morfológicas para limpiar el ruido
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
-    mask_green = cv2.erode(mask_green, kernel=kernel, iterations=4)
-
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    mask_green = cv2.morphologyEx(mask_green, cv2.MORPH_CLOSE, kernel, iterations=1)
+    mask_players = cv2.dilate(mask_players, kernel, iterations=3)
     
-    img_green_filled = img.copy()
-    img_green_filled[mask_green == 0] = [0, 0, 0]
-
-    # Inversa de la máscara
-    mask_black = cv2.bitwise_not(mask_green)
-
-    # Detectar contornos de las regiones negras
-    contours, _ = cv2.findContours(mask_black, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+    mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_OPEN, kernel, iterations=1)
+    mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_CLOSE, kernel, iterations=1)
+    return mask_players
+    # Detectar contornos de las regiones no verdes (jugadores)
+    contours, _ = cv2.findContours(mask_players, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     return contours

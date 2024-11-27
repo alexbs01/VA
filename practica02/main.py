@@ -4,47 +4,33 @@ import skimage as ski
 import numpy as np
 import utils
 import matplotlib.image as mpimg
+import os
 
 def main():
-    img = mpimg.imread('practica02/img/33.jpg')
+    imgs = os.listdir('practica02/img')
+    
+    imgs.sort()
+    
+    imgs = imgs[len(imgs)//2:]
+    imgs = imgs[len(imgs)//2:]
 
-    imgRed = img[:, :, 0]
-    imgGreen = img[:, :, 1]
-    imgBlue = img[:, :, 2]
-
-    imgRG = np.zeros_like(img)
-    imgRG[:, :, 0] = imgRed
-    imgRG[:, :, 1] = imgGreen
-    
-    imgGB = np.zeros_like(img)
-    imgGB[:, :, 0] = imgGreen
-    imgGB[:, :, 1] = imgBlue
-    
-    imgBR = np.zeros_like(img)
-    imgBR[:, :, 0] = imgBlue
-    imgBR[:, :, 1] = imgRed
-    
-    imgRed_eq = cv2.equalizeHist(imgRed)
-    imgGreen_eq = cv2.equalizeHist(imgGreen)
-    imgBlue_eq = cv2.equalizeHist(imgBlue)
-    
-    #img_high_green_erode_dilate = cv2.dilate(img_high_green_erode, np.ones((10, 10), np.uint8), iterations=5)
+    for img in imgs:
+    #img = mpimg.imread('practica02/img/33.jpg')
+        img = mpimg.imread('practica02/img/' + img)
+        imgOut = f.detectField(img)
         
-    #utils.show_imgs([imgRed, imgGreen, imgBlue])
-    #utils.show_imgs([imgRG, imgGB, imgBR])
-    #utils.show_imgs([imgRed_eq, imgGreen_eq, imgBlue_eq])
-    
-    imgOut = f.detectField(img)
-    
-    playersContours = f.findPlayers(imgOut)
-    imgOut = utils.drawPlayers(imgOut, playersContours)
+        imgOut = f.findPlayers(imgOut)
+        #imgOut = utils.drawPlayers(imgOut, playersContours)
 
-    #imgGray = ski.util.img_as_float(imgGray)
-    #imgEqualized = cv2.equalizeHist(imgOut)
-    
-    #imgEqualized = cv2.equalizeHist(imgOut)
-    
-    utils.show_imgs([img, imgOut])
+        #imgOut = cv2.cvtColor(imgOut, cv2.COLOR_BGR2GRAY)
+        #imgOut = cv2.medianBlur(imgWB, 71)
+
+        #imgGray = ski.util.img_as_float(imgGray)
+        #imgEqualized = cv2.equalizeHist(imgOut)
+        
+        #imgEqualized = cv2.equalizeHist(imgOut)
+        
+        utils.show_imgs([img, imgOut])
     
         
 
