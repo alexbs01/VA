@@ -18,8 +18,8 @@ def main():
     #img = mpimg.imread('practica02/img/33.jpg')
         img = mpimg.imread('practica02/img/' + img)
         imgOut = f.detectField(img)
-        
-        imgOut = f.findPlayers(imgOut)
+        imgOut = f.findGrassLines(imgOut)
+        #imgOut = f.findPlayers(imgOut)
         #imgOut = utils.drawPlayers(imgOut, playersContours)
 
         #imgOut = cv2.cvtColor(imgOut, cv2.COLOR_BGR2GRAY)
