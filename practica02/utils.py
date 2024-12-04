@@ -51,6 +51,15 @@ def drawPlayers(img, contours):
     
     return imgOut
 
+def drawGrassLines(img, lines):
+    imgOut = img.copy()
+    
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 0), 2)
+    
+    return imgOut
+
 def show_imgs(arrayImages):
     _, axs = plt.subplots(len(arrayImages), 1, figsize=(24, 16))
 

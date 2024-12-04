@@ -4,6 +4,7 @@ import skimage as ski
 import numpy as np
 import utils
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 import os
 
 def main():
@@ -18,7 +19,8 @@ def main():
     #img = mpimg.imread('practica02/img/33.jpg')
         img = mpimg.imread('practica02/img/' + img)
         imgOut = f.detectField(img)
-        imgOut = f.findGrassLines(imgOut)
+        lines = f.findGrassLines(imgOut)
+        imgOut = utils.drawGrassLines(imgOut, lines)
         #imgOut = f.findPlayers(imgOut)
         #imgOut = utils.drawPlayers(imgOut, playersContours)
 
@@ -29,9 +31,8 @@ def main():
         #imgEqualized = cv2.equalizeHist(imgOut)
         
         #imgEqualized = cv2.equalizeHist(imgOut)
-        
+
         utils.show_imgs([img, imgOut])
-    
         
 
 if __name__ == "__main__":

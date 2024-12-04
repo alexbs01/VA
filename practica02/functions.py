@@ -40,49 +40,48 @@ def findPlayers(image):
 
 def findGrassLines(image):
     img = image.copy()
-    # Convertir la imagen al espacio de color HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     
-    # Rango de valores para el color verde (puedes ajustarlo según el campo)
-    lower_green = np.array([35, 0, 0])  # Mínimo para verde
-    upper_green = np.array([80, 150, 165])  # Máximo para verde
+    lower_green = np.array([35, 0, 0])
+    upper_green = np.array([80, 150, 175])
     
-    # Crear una máscara para el color verde
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
-    #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    #mask_green = cv2.erode(mask_green, kernel=kernel, iterations=1)
+
     
     imgOut = img.copy()
     imgOut[mask_green == 0] = [0, 0, 0]
     #return imgOut
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    imgOut = cv2.erode(imgOut, kernel, iterations=1)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
     print(kernel)
-    #imgOut = cv2.dilate(imgOut, kernel, iterations=59)
-    #imgOut = cv2.erode(imgOut, kernel, iterations=59)
-    
-    imgOut[:, :, 1] = cv2.GaussianBlur(imgOut[:, :, 1], (25, 25), 0)
-    imgOut[:, :, 1] = cv2.equalizeHist(imgOut[:, :, 1])
-    
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
-    imgOut = cv2.dilate(imgOut, kernel, iterations=31)
-    imgOut = cv2.erode(imgOut, kernel, iterations=31)
+    imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_CLOSE, kernel, iterations=7)
+
     imgOut = cv2.cvtColor(imgOut, cv2.COLOR_RGB2GRAY)
-    imgOut = cv2.convertScaleAbs(imgOut, alpha=0.5, beta=100)
-    #max = 255
-    #imgOut = cv2.Canny(imgOut, max * 0.1, max * 0.3)
-    print(imgOut)
-    #kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    #imgOut[:, :, 1] = cv2.morphologyEx(imgOut[:, :, 1], cv2.MORPH_CLOSE, kernel, iterations=11)
-    #kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    #imgOut[:, :, 1] = cv2.morphologyEx(imgOut[:, :, 1], cv2.MORPH_CLOSE, kernel, iterations=7)
-    #imgOut[:, :, 1] = cv2.dilate(imgOut[:,:,1], kernel, iterations=3)
-    #imgOut[:, :, 1] = cv2.erode(imgOut[:,:,1], kernel, iterations=3)
-    #imgOut = cv2.GaussianBlur(imgOut, (7, 7), 0)
-    #imgOut = cv2.Canny(imgOut[:,:, 1], 30, 80)
-    #imgOut = cv2.HoughLines(imgOut, 1, 2, 2)
-    #imgOut = cv2.GaussianBlur(imgOut, (7, 7), 0)
     
-    #imgOut = cv2.Canny(imgOut, 1, 10)
+    #imgOut = cv2.equalizeHist(imgOut)
+    #imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_OPEN, kernel, iterations=7)
+    #imgOut = cv2.GaussianBlur(imgOut, (75, 75), 0)
+    #imgOut = cv2.equalizeHist(imgOut)
+
+    #return imgOut
+    #imgOut = cv2.medianBlur(imgOut, 71)
+    #imgOut = cv2.equalizeHist(imgOut)
     
+    grad_x = cv2.Sobel(imgOut, cv2.CV_64F, 1, 0, ksize=3)  # Gradiente en x
+    grad_y = cv2.Sobel(imgOut, cv2.CV_64F, 0, 1, ksize=3)  # Gradiente en y
+
+    # Magnitud del gradiente
+    magnitude = cv2.magnitude(grad_x, grad_y)
+
+    # Normalizar la magnitud para mostrarla como imagen
+    imgOut = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    imgOut = cv2.equalizeHist(imgOut)
+    #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
+    #imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_CLOSE, kernel, iterations=1)
+    imgOut = cv2.medianBlur(imgOut, 9)
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 7))
+    imgOut = cv2.erode(imgOut, kernel, iterations=1)
+    lines = cv2.HoughLinesP(imgOut, 1, np.pi / 180, 100, minLineLength=100, maxLineGap=10)
     
-    return imgOut
+    return lines
