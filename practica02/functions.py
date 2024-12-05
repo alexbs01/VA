@@ -82,6 +82,6 @@ def findGrassLines(image):
     imgOut = cv2.medianBlur(imgOut, 9)
     kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 7))
     imgOut = cv2.erode(imgOut, kernel, iterations=1)
-    lines = cv2.HoughLinesP(imgOut, 1, np.pi / 180, 100, minLineLength=100, maxLineGap=10)
+    lines = cv2.HoughLinesP(imgOut, 1, np.pi / 180, 200, minLineLength=100, maxLineGap=100, lines=10)
     
     return lines

@@ -53,10 +53,33 @@ def drawPlayers(img, contours):
 
 def drawGrassLines(img, lines):
     imgOut = img.copy()
+    angleThreshold = 20
+        
+    print(lines)
     
-    for line in lines:
-        x1, y1, x2, y2 = line[0]
-        cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 0), 2)
+    if not lines is None:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            
+            if y2 < y1:
+                x1, y1, x2, y2 = x2, y2, x1, y1
+            
+            if (y2 - y1) < 100:
+                continue
+            
+            angle = np.degrees(np.arctan(y2 - y1 / x2 - x1))
+            if angle < 0:
+                angle += 180
+                
+            print(lines)
+            if not (90 - angleThreshold < angle < 90 + angleThreshold):
+                continue
+            
+            cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 2)
+            if x1 == 1024 and x2 == 1135:
+                print("Esta es", angle)
+                print(x1, y1, x2, y2)
+                cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 0), 4)
     
     return imgOut
 
