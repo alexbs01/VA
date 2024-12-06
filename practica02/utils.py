@@ -51,65 +51,80 @@ def drawPlayers(img, contours):
     
     return imgOut
 
+def lines_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
+    """
+        Verifica si dos líneas se cortan
+    """
+    def ccw(ax, ay, bx, by, cx, cy):
+        return (cy - ay) * (bx - ax) > (by - ay) * (cx - ax)
+
+    return (
+        ccw(x1, y1, x3, y3, x4, y4) != ccw(x2, y2, x3, y3, x4, y4)
+        and ccw(x1, y1, x2, y2, x3, y3) != ccw(x1, y1, x2, y2, x4, y4)
+    )
+
 def drawGrassLines(img, lines):
     imgOut = img.copy()
-    angleThreshold = 20  # Umbral para definir horizontales y verticales
-    minVerticalSeparation = 25  # Separación mínima entre líneas verticales
-    minDiagonalSeparation = 25  # Separación mínima entre líneas diagonales
+    angleThreshold = 20
+    minSeparation = 75
 
-    verticalLines = []
-    diagonalLines = []
+    filteredLines = []
 
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
 
-            # Asegurarse de que (x1, y1) es el punto inferior
             if y2 < y1:
                 x1, y1, x2, y2 = x2, y2, x1, y1
 
-            # Calcular el ángulo en grados
             angle = np.degrees(np.arctan2(y2 - y1, x2 - x1))
 
-            # Normalizar el ángulo a un rango de 0-180 grados
             if angle < 0:
                 angle += 180
 
-            # Filtrar líneas horizontales (ángulo cercano a 0 o 180)
             if 0 <= angle < angleThreshold or 180 - angleThreshold < angle <= 180:
                 continue
 
-            # Filtrar y almacenar líneas verticales (ángulo cercano a 90)
-            if 90 - angleThreshold < angle < 90 + angleThreshold:
-                tooClose = False
-                for vx1, vy1, vx2, vy2 in verticalLines:
-                    if abs(x1 - vx1) < minVerticalSeparation:
+            lineLength = np.hypot(x2 - x1, y2 - y1)
+
+            tooClose = False
+            for fx1, fy1, fx2, fy2, fangle, flength in filteredLines:
+
+                dist = min(
+                    np.hypot(x1 - fx1, y1 - fy1),
+                    np.hypot(x2 - fx2, y2 - fy2),
+                    np.hypot(x1 - fx2, y1 - fy2),
+                    np.hypot(x2 - fx1, y2 - fy1),
+                )
+                
+                if dist < minSeparation:
+                    if abs(fangle - 90) < abs(angle - 90) or flength > lineLength:
                         tooClose = True
                         break
-
-                if tooClose:
-                    continue
-
-                verticalLines.append((x1, y1, x2, y2))
-            else:
-                # Filtrar y almacenar líneas diagonales
-                tooClose = False
-                for dx1, dy1, dx2, dy2 in diagonalLines:
-                    if np.hypot(dx1 - x1, dy1 - y1) < minDiagonalSeparation:
-                        tooClose = True
+                    else:
+                        filteredLines.remove((fx1, fy1, fx2, fy2, fangle, flength))
                         break
 
-                if tooClose:
-                    continue
+            if tooClose:
+                continue
 
-                diagonalLines.append((x1, y1, x2, y2))
+            intersects = 0
+            for fx1, fy1, fx2, fy2, _, _ in filteredLines:
+                if lines_intersect(x1, y1, x2, y2, fx1, fy1, fx2, fy2):
+                    intersects += 1
+                    if intersects > 1:
+                        break
 
-            # Dibujar la línea (magenta)
+            if intersects > 1:
+                continue
+
+            filteredLines.append((x1, y1, x2, y2, angle, lineLength))
+
+        # Dibujar las líneas seleccionadas
+        for x1, y1, x2, y2, _, _ in filteredLines:
             cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 2)
 
     return imgOut
-
-
 
 def show_imgs(arrayImages):
     _, axs = plt.subplots(len(arrayImages), 1, figsize=(24, 16))
