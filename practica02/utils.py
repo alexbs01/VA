@@ -53,35 +53,63 @@ def drawPlayers(img, contours):
 
 def drawGrassLines(img, lines):
     imgOut = img.copy()
-    angleThreshold = 20
-        
-    print(lines)
-    
-    if not lines is None:
+    angleThreshold = 20  # Umbral para definir horizontales y verticales
+    minVerticalSeparation = 25  # Separación mínima entre líneas verticales
+    minDiagonalSeparation = 25  # Separación mínima entre líneas diagonales
+
+    verticalLines = []
+    diagonalLines = []
+
+    if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            
+
+            # Asegurarse de que (x1, y1) es el punto inferior
             if y2 < y1:
                 x1, y1, x2, y2 = x2, y2, x1, y1
-            
-            if (y2 - y1) < 100:
-                continue
-            
-            angle = np.degrees(np.arctan(y2 - y1 / x2 - x1))
+
+            # Calcular el ángulo en grados
+            angle = np.degrees(np.arctan2(y2 - y1, x2 - x1))
+
+            # Normalizar el ángulo a un rango de 0-180 grados
             if angle < 0:
                 angle += 180
-                
-            print(lines)
-            if not (90 - angleThreshold < angle < 90 + angleThreshold):
+
+            # Filtrar líneas horizontales (ángulo cercano a 0 o 180)
+            if 0 <= angle < angleThreshold or 180 - angleThreshold < angle <= 180:
                 continue
-            
+
+            # Filtrar y almacenar líneas verticales (ángulo cercano a 90)
+            if 90 - angleThreshold < angle < 90 + angleThreshold:
+                tooClose = False
+                for vx1, vy1, vx2, vy2 in verticalLines:
+                    if abs(x1 - vx1) < minVerticalSeparation:
+                        tooClose = True
+                        break
+
+                if tooClose:
+                    continue
+
+                verticalLines.append((x1, y1, x2, y2))
+            else:
+                # Filtrar y almacenar líneas diagonales
+                tooClose = False
+                for dx1, dy1, dx2, dy2 in diagonalLines:
+                    if np.hypot(dx1 - x1, dy1 - y1) < minDiagonalSeparation:
+                        tooClose = True
+                        break
+
+                if tooClose:
+                    continue
+
+                diagonalLines.append((x1, y1, x2, y2))
+
+            # Dibujar la línea (magenta)
             cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 2)
-            if x1 == 1024 and x2 == 1135:
-                print("Esta es", angle)
-                print(x1, y1, x2, y2)
-                cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 0), 4)
-    
+
     return imgOut
+
+
 
 def show_imgs(arrayImages):
     _, axs = plt.subplots(len(arrayImages), 1, figsize=(24, 16))

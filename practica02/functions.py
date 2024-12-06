@@ -68,8 +68,8 @@ def findGrassLines(image):
     #imgOut = cv2.medianBlur(imgOut, 71)
     #imgOut = cv2.equalizeHist(imgOut)
     
-    grad_x = cv2.Sobel(imgOut, cv2.CV_64F, 1, 0, ksize=3)  # Gradiente en x
-    grad_y = cv2.Sobel(imgOut, cv2.CV_64F, 0, 1, ksize=3)  # Gradiente en y
+    grad_x = cv2.Sobel(imgOut, cv2.CV_64F, 1, 0, ksize=15)  # Gradiente en x
+    grad_y = cv2.Sobel(imgOut, cv2.CV_64F, 0, 1, ksize=11)  # Gradiente en y
 
     # Magnitud del gradiente
     magnitude = cv2.magnitude(grad_x, grad_y)
@@ -77,11 +77,20 @@ def findGrassLines(image):
     # Normalizar la magnitud para mostrarla como imagen
     imgOut = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
     imgOut = cv2.equalizeHist(imgOut)
-    #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
-    #imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_CLOSE, kernel, iterations=1)
-    imgOut = cv2.medianBlur(imgOut, 9)
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 7))
+    imgOut = cv2.medianBlur(imgOut, 11)
+    #return imgOut
+    for _ in range(5):
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+        imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_CLOSE, kernel, iterations=1)
+
+        imgOut = cv2.medianBlur(imgOut, 3)
+        imgOut = cv2.morphologyEx(imgOut, cv2.MORPH_OPEN, kernel, iterations=1)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     imgOut = cv2.erode(imgOut, kernel, iterations=1)
-    lines = cv2.HoughLinesP(imgOut, 1, np.pi / 180, 200, minLineLength=100, maxLineGap=100, lines=10)
+    imgOut = cv2.medianBlur(imgOut, 3)
+    
+
+    lines = cv2.HoughLinesP(imgOut, 1, np.pi / 180, 200, minLineLength=100, maxLineGap=300)
     
     return lines
