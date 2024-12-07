@@ -42,19 +42,16 @@ def drawPlayers(img, contours):
     print("###")
     
     for contour in contours:
-        if cv2.contourArea(contour) < 1000:
+        if cv2.contourArea(contour) < 50:
             continue
         x, y, w, h = cv2.boundingRect(contour)
         print(w, h)
-        if w < h * 1.3 and h < 3 * w and  w < 500 and  h < 200:
+        if w < 500 and h < 400:
             cv2.rectangle(imgOut, (x, y), (x + w, y + h), (255, 0, 0), 2)
     
     return imgOut
 
 def lines_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
-    """
-        Verifica si dos líneas se cortan
-    """
     def ccw(ax, ay, bx, by, cx, cy):
         return (cy - ay) * (bx - ax) > (by - ay) * (cx - ax)
 
@@ -120,7 +117,6 @@ def drawGrassLines(img, lines):
 
             filteredLines.append((x1, y1, x2, y2, angle, lineLength))
 
-        # Dibujar las líneas seleccionadas
         for x1, y1, x2, y2, _, _ in filteredLines:
             cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 2)
 

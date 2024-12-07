@@ -26,12 +26,18 @@ def findPlayers(image):
     mask_players = cv2.bitwise_not(mask_green)
     
     # Aplicar operaciones morfológicas para limpiar el ruido
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    mask_players = cv2.dilate(mask_players, kernel, iterations=5)
-    
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_OPEN, kernel, iterations=3)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 5))
+    mask_players = cv2.dilate(mask_players, kernel, iterations=7)
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5))
+    mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_OPEN, kernel, iterations=5)
     mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_CLOSE, kernel, iterations=3)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1), anchor=(0,0))
+    mask_players = cv2.dilate(mask_players, kernel, iterations=1)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 1), anchor=(0,0))
+    print(kernel)
+    mask_players = cv2.erode(mask_players, kernel, iterations=3)
     
     # Detectar contornos de las regiones no verdes (jugadores)
     contours, _ = cv2.findContours(mask_players, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
