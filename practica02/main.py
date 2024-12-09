@@ -16,13 +16,14 @@ def main():
     #imgs = imgs[len(imgs)//2:]
 
     for img in imgs:
-    #img = mpimg.imread('practica02/img/33.jpg')
         img = mpimg.imread('practica02/img/' + img)
         imgOut = f.detectField(img)
-        lines = f.findGrassLines(imgOut)
-        playersContours = f.findPlayers(imgOut)
+        
+        lines = f.prueba(imgOut)
+        #lines = f.findGrassLines(imgOut)
+        #playersContours = f.findPlayers(imgOut)
         imgOut = utils.drawGrassLines(imgOut, lines)
-        imgOut = utils.drawPlayers(imgOut, playersContours)
+        #imgOut = utils.drawPlayers(imgOut, playersContours)
 
         utils.show_imgs([img, imgOut])
         

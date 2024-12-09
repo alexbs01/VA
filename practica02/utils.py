@@ -4,22 +4,17 @@ import numpy as np
 import os
 
 def maskField(image):
-    # Convertir al espacio de color HSV para segmentar el verde
     img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
-    # Rango dinámico para el color verde
-    lower_green = np.array([35, 20, 20])  # Tonalidad, saturación, brillo
+    lower_green = np.array([35, 20, 20])
     upper_green = np.array([85, 255, 255])
     
-    # Crear una máscara para el color verde
     mask_green = cv2.inRange(img_hsv, lower_green, upper_green)
 
-    # Aplicar operaciones morfológicas para limpiar la máscara
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     mask_cleaned = cv2.morphologyEx(mask_green, cv2.MORPH_CLOSE, kernel, iterations=1)
     mask_cleaned = cv2.morphologyEx(mask_cleaned, cv2.MORPH_OPEN, kernel, iterations=3)
     
-    # Opcional: dilatar ligeramente para aumentar las áreas verdes
     kernel_dilate = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     mask_final = cv2.dilate(mask_cleaned, kernel_dilate, iterations=1)
     
@@ -35,17 +30,40 @@ def maskField(image):
     
     return contourMask
 
+def maskPlayers(image):
+    img = cv2.GaussianBlur(image, (5, 5), 0)
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    
+    lower_green = np.array([35, 20, 20])
+    upper_green = np.array([85, 255, 255])
+    
+    mask_green = cv2.inRange(hsv, lower_green, upper_green)
+    
+    mask_players = cv2.bitwise_not(mask_green)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 5))
+    mask_players = cv2.dilate(mask_players, kernel, iterations=7)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5))
+    mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_OPEN, kernel, iterations=5)
+    mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_CLOSE, kernel, iterations=3)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1), anchor=(0,0))
+    mask_players = cv2.dilate(mask_players, kernel, iterations=1)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 1), anchor=(0,0))
+    mask_players = cv2.erode(mask_players, kernel, iterations=3)
+    return mask_players
+
 def drawPlayers(img, contours):
     imgOut = img.copy()
-    height, width = img.shape[:2]
-    print(height, width)
-    print("###")
     
     for contour in contours:
         if cv2.contourArea(contour) < 50:
             continue
+        
         x, y, w, h = cv2.boundingRect(contour)
-        print(w, h)
         if w < 500 and h < 400:
             cv2.rectangle(imgOut, (x, y), (x + w, y + h), (255, 0, 0), 2)
     
