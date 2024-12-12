@@ -66,6 +66,8 @@ def prueba(image):
     imgOut = np.copy(image)
 
     imgOut = cv2.medianBlur(imgOut, 11)
+    imgOut = cv2.GaussianBlur(imgOut, (5, 11), 0)
+    #return imgOut
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
     imgOut = cv2.medianBlur(imgOut, 11)
     imgOut = cv2.cvtColor(imgOut, cv2.COLOR_RGB2GRAY)
@@ -91,6 +93,6 @@ def prueba(image):
     imgOut = cv2.bitwise_and(imgOut, mask_players)
     
     #return imgOut
-    lines = cv2.HoughLinesP(imgOut, 1, np.pi / 180, 200, minLineLength=100, maxLineGap=300)
+    lines = cv2.HoughLinesP(imgOut, 5, np.pi / 180, 1000, minLineLength=100, maxLineGap=1000)
     
     return lines
