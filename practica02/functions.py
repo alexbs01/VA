@@ -65,21 +65,24 @@ def findGrassLines(image):
 def prueba(image):
     imgOut = np.copy(image)
 
-    imgOut = cv2.medianBlur(imgOut, 11)
-    imgOut = cv2.GaussianBlur(imgOut, (5, 11), 0)
+    imgOut = cv2.medianBlur(imgOut, 15)
+    imgOut = cv2.GaussianBlur(imgOut, (11, 21), 0)
     #return imgOut
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
     imgOut = cv2.medianBlur(imgOut, 11)
-    imgOut = cv2.cvtColor(imgOut, cv2.COLOR_RGB2GRAY)
     
+    #imgOut = cv2.cvtColor(imgOut, cv2.COLOR_RGB2GRAY)
+    imgOut = imgOut[:, :, 2]
+    #return imgOut
     grad_x = cv2.Sobel(imgOut, cv2.CV_64F, 1, 0, ksize=15)
     grad_y = cv2.Sobel(imgOut, cv2.CV_64F, 0, 1, ksize=11)
 
     magnitude = cv2.magnitude(grad_x, grad_y)
 
-    imgOut = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    imgOut = cv2.normalize(magnitude, None, 130, 255, cv2.NORM_MINMAX).astype(np.uint8)
     imgOut = cv2.equalizeHist(imgOut)
-    
+    #return imgOut
+    imgOut = cv2.equalizeHist(imgOut)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
     imgOut = cv2.erode(imgOut, kernel, iterations=1)
     imgOut = cv2.medianBlur(imgOut, 11)
