@@ -12,6 +12,7 @@ def detectField(img):
 
 def findPlayers(image):
     mask_players = utils.maskPlayers(image)
+    #return mask_players
     contours, _ = cv2.findContours(mask_players, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     return contours
