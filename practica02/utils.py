@@ -83,7 +83,7 @@ def drawPlayers(img, contours):
         
         x, y, w, h = cv2.boundingRect(contour)
         #if w < 500 and h < 400 and w <= 1.3 * h:
-        cv2.rectangle(imgOut, (x, y-10), (x + w, y + h+20), (255, 0, 0), 2)
+        cv2.rectangle(imgOut, (x, y - 10), (x + w, y + h + 10), (255, 0, 0), 2)
     
     return imgOut
 
@@ -106,7 +106,8 @@ def drawGrassLines(img, lines):
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-
+            #filteredLines.append((x1, y1, x2, y2, 1, 1))
+            #continue
             if y2 < y1:
                 x1, y1, x2, y2 = x2, y2, x1, y1
 

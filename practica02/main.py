@@ -19,8 +19,7 @@ def main():
         img = mpimg.imread('practica02/img/' + img)
         imgOut = f.detectField(img)
         
-        lines = f.prueba(imgOut)
-        #lines = f.findGrassLines(imgOut)
+        lines = f.findGrassLines(imgOut)
         playersContours = f.findPlayers(imgOut)
         imgOut = utils.drawGrassLines(imgOut, lines)
         imgOut = utils.drawPlayers(imgOut, playersContours)
