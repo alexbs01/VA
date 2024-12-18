@@ -20,9 +20,9 @@ def main():
         imgOut = f.detectField(img)
         
         lines = f.findGrassLines(imgOut)
-        playersContours = f.findPlayers(imgOut)
+        # playersContours = f.findPlayers(imgOut)
         imgOut = utils.drawGrassLines(imgOut, lines)
-        imgOut = utils.drawPlayers(imgOut, playersContours)
+        # imgOut = utils.drawPlayers(imgOut, playersContours)
 
         utils.show_imgs([img, imgOut])
         

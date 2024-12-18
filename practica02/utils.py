@@ -98,16 +98,16 @@ def lines_intersect(x1, y1, x2, y2, x3, y3, x4, y4):
 
 def drawGrassLines(img, lines):
     imgOut = img.copy()
-    angleThreshold = 20
-    minSeparation = 75
+    angleThreshold = 10
+    minSeparation = 20
 
     filteredLines = []
 
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
-            #filteredLines.append((x1, y1, x2, y2, 1, 1))
-            #continue
+            # filteredLines.append((x1, y1, x2, y2, 1, 1))
+            # continue
             if y2 < y1:
                 x1, y1, x2, y2 = x2, y2, x1, y1
 
@@ -155,7 +155,7 @@ def drawGrassLines(img, lines):
             filteredLines.append((x1, y1, x2, y2, angle, lineLength))
 
         for x1, y1, x2, y2, _, _ in filteredLines:
-            cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 2)
+            cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 3)
 
     return imgOut
 
