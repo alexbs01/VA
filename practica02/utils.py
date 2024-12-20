@@ -37,10 +37,11 @@ def maskPlayers(image):
     upper_green = np.array([85, 255, 255])
     
     mask_field = maskField(image)
+    
     mask_green = cv2.inRange(hsv, lower_green, upper_green)
+    
     mask_players = cv2.bitwise_not(mask_green)
     mask_players = cv2.bitwise_and(mask_players, mask_field)
-    #return mask_players
     
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 2))
     mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_CLOSE, kernel, iterations=1)
@@ -53,7 +54,6 @@ def maskPlayers(image):
     
     contours = cv2.findContours(mask_players, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
     maxContour = max(contours, key=cv2.contourArea)
-    print(maxContour)
     contourMask = np.zeros_like(mask_players)
     cv2.drawContours(contourMask, [maxContour], -1, 255, -1)
     
@@ -63,7 +63,6 @@ def maskPlayers(image):
     mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_OPEN, kernel, iterations=1)
     mask_players = cv2.morphologyEx(mask_players, cv2.MORPH_CLOSE, kernel, iterations=1)
     
-    #return mask_players
     
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 1), anchor=(0,0))
     mask_players = cv2.dilate(mask_players, kernel, iterations=1)
@@ -78,11 +77,8 @@ def drawPlayers(img, contours):
     imgOut = img.copy()
     
     for contour in contours:
-        #if cv2.contourArea(contour) > 1000:
-        #    continue
-        
         x, y, w, h = cv2.boundingRect(contour)
-        #if w < 500 and h < 400 and w <= 1.3 * h:
+
         cv2.rectangle(imgOut, (x, y - 10), (x + w, y + h + 10), (255, 0, 0), 2)
     
     return imgOut
@@ -155,7 +151,7 @@ def drawGrassLines(img, lines):
             filteredLines.append((x1, y1, x2, y2, angle, lineLength))
 
         for x1, y1, x2, y2, _, _ in filteredLines:
-            cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 3)
+            cv2.line(imgOut, (x1, y1), (x2, y2), (255, 0, 255), 2)
 
     return imgOut
 
